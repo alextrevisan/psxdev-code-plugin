@@ -1,0 +1,7 @@
+# Arquivo de configuração do PlayStation 1
+# Define o executável principal e configurações de memória
+
+BOOT = cdrom:\HELLO.EXE;1
+TCB = 4
+EVENT = 10
+STACK = 801FFF00

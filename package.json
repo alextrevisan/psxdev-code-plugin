@@ -1,0 +1,71 @@
+{
+  "name": "ps1-dev-extension",
+  "displayName": "PlayStation 1 Development",
+  "description": "PlayStation 1 development environment for VSCode/Windsurf",
+  "version": "0.1.0",
+  "publisher": "PSDevTools",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/psdevtools/ps1-dev-extension"
+  },
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages",
+    "Snippets"
+  ],
+  "keywords": [
+    "playstation",
+    "ps1",
+    "psn00b",
+    "sdk",
+    "game development"
+  ],
+  "icon": "images/icon.png",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "ps1-dev-extension.setupEnvironment",
+        "title": "PS1: Setup Development Environment"
+      },
+      {
+        "command": "ps1-dev-extension.createHelloWorld",
+        "title": "PS1: Create Hello World Project"
+      },
+      {
+        "command": "ps1-dev-extension.buildProject",
+        "title": "PS1: Build Project"
+      },
+      {
+        "command": "ps1-dev-extension.runEmulator",
+        "title": "PS1: Run in Emulator"
+      },
+      {
+        "command": "ps1-dev-extension.generateISO",
+        "title": "PS1: Generate ISO"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "echo 'No compilation needed'",
+    "lint": "echo 'No linting configured'",
+    "test": "echo 'No tests configured'"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "axios": "^1.6.7",
+    "extract-zip": "^2.0.1",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.7",
+    "@types/vscode": "^1.60.0"
+  }
+}

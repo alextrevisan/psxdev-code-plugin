@@ -1,0 +1,16 @@
+{
+  "tools": {
+    "gcc": {
+      "url": "",
+      "installed": false
+    },
+    "ps1sdk": {
+      "url": "",
+      "installed": false
+    },
+    "emulator": {
+      "url": "",
+      "installed": false
+    }
+  }
+}

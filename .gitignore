@@ -1,0 +1,7 @@
+node_modules
+.vscode-test/
+*.vsix
+tools/gcc/
+tools/ps1sdk/
+tools/emulator/
+.DS_Store

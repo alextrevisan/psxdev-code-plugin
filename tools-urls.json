@@ -1,0 +1,40 @@
+{
+  "gcc": {
+    "url": "https://github.com/alextrevisan/mipsel-none-elf/releases/download/14.2.0/mipsel-none-elf-14.2.0.zip",
+    "extractPath": "tools/gcc",
+    "checkFile": "bin/mipsel-none-elf-gcc",
+    "platform": "darwin"
+  },
+  "gcc_win": {
+    "url": "https://github.com/alextrevisan/mipsel-none-elf/releases/download/14.2.0/mipsel-none-elf-14.2.0-win.zip",
+    "extractPath": "tools/gcc",
+    "checkFile": "bin/mipsel-none-elf-gcc.exe",
+    "platform": "win32"
+  },
+  "psn00b_sdk": {
+    "url": "https://github.com/alextrevisan/PSn00bSDK-MacOS/releases/download/28-02-25/psn00b-sdk-macos.zip",
+    "extractPath": "tools/psn00b_sdk",
+    "checkFile": "bin/elf2x",
+    "platform": "darwin"
+  },
+  "psn00b_sdk_win": {
+    "url": "https://github.com/alextrevisan/PSn00bSDK-Windows/releases/download/28-02-25/psn00b-sdk-windows.zip",
+    "extractPath": "tools/psn00b_sdk",
+    "checkFile": "bin/elf2x.exe",
+    "platform": "win32"
+  },
+  "emulator_mac": {
+    "url": "https://distrib.app/storage/assets/7db/12f/0f7/7ad7a85595c95d0e3d175520473f0529f801effbf1283cc106cffed/PCSX-Redux-c7d263b8-Arm.dmg",
+    "extractPath": "tools/emulator",
+    "checkFile": "PCSX-Redux.app/Contents/MacOS/pcsx-redux",
+    "optional": true,
+    "platform": "darwin"
+  },
+  "emulator_win": {
+    "url": "https://github.com/grumpycoders/pcsx-redux/releases/download/v0.8.0/pcsx-redux-win-x64-0.8.0.zip",
+    "extractPath": "tools/emulator",
+    "checkFile": "pcsx-redux.exe",
+    "optional": true,
+    "platform": "win32"
+  }
+}

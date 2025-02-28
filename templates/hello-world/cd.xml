@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<iso_project image_name="game.bin" cue_sheet="game.cue" no_xa="1">
+  <track type="data">
+    <identifiers
+      system          = "PLAYSTATION"
+      volume          = "HELLO_WORLD"
+      volume_set      = "HELLO_WORLD"
+      publisher       = "PSDEVTOOLS"
+      data_preparer   = "PSN00BSDK"
+      application     = "PLAYSTATION"
+      copyright       = "NONE"
+    />
+    
+    <directory_tree>
+      <file name="SYSTEM.CNF" type="data" source="system.cnf"/>
+      <file name="HELLO.EXE" type="data" source="bin/hello_world.exe"/>
+    </directory_tree>
+  </track>
+</iso_project>
