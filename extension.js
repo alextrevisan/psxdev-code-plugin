@@ -114,8 +114,6 @@ async function checkAndSetupEnvironment() {
             saveConfig(config);
             console.log('PlayStation 1 development environment already set up with included tools');
             
-            // Ensure the Hello World template is created
-            await createHelloWorldTemplate();
             return;
         }
         
@@ -187,9 +185,6 @@ async function setupEnvironment(isManualSetup = false) {
         config.tools.gdb = { installed: true };
         saveConfig(config);
         
-        // Ensure the Hello World template is created
-        await createHelloWorldTemplate();
-        
         vscode.window.showInformationMessage('Tools already included in the plugin. Environment configured successfully!');
         return;
     }
@@ -246,148 +241,11 @@ async function setupEnvironment(isManualSetup = false) {
     // Save the configuration
     saveConfig(config);
     
-    // Create the Hello World template
-    await createHelloWorldTemplate();
-    
     if (downloadSuccess) {
         vscode.window.showInformationMessage('PlayStation 1 development environment setup complete!');
     } else {
         vscode.window.showErrorMessage('Failed to set up PlayStation 1 development environment. Check the logs for details.');
     }
-}
-
-// Function to create a Hello World template
-async function createHelloWorldTemplate() {
-    const helloWorldPath = path.join(templatesPath, 'hello-world');
-    await ensureDirectoryExists(helloWorldPath);
-
-    // Check if the template files already exist
-    const mainCPath = path.join(helloWorldPath, 'main.c');
-    const makefilePath = path.join(helloWorldPath, 'Makefile');
-    const setupMkPath = path.join(helloWorldPath, 'setup.mk');
-    
-    if (fs.existsSync(mainCPath) && fs.existsSync(makefilePath) && fs.existsSync(setupMkPath)) {
-        console.log('Hello World template already exists');
-        return;
-    }
-
-    // Create main.c
-    const mainCContent = `
-#include <stdio.h>
-#include <stdlib.h>
-#include <psx.h>
-#include <sys/types.h>
-#include <psxgpu.h>
-#include <psxgte.h>
-#include <psxpad.h>
-
-// Define display/drawing environments
-DISPENV disp;
-DRAWENV draw;
-
-int main() {
-    // Initialize the PlayStation
-    PSX_Init();
-    
-    // Set up the display and drawing environments for NTSC mode
-    SetDefDispEnv(&disp, 0, 0, 320, 240);
-    SetDefDrawEnv(&draw, 0, 0, 320, 240);
-    
-    // Set the background color to black
-    setRGB0(&draw, 0, 0, 0);
-    draw.isbg = 1;
-    
-    // Apply the environments
-    PutDispEnv(&disp);
-    PutDrawEnv(&draw);
-    
-    // Set the text color to white
-    FntLoad(960, 0);
-    SetDumpFnt(FntOpen(16, 16, 320, 240, 0, 512));
-    
-    // Main loop
-    while(1) {
-        // Clear the display
-        ClearImage(&draw.clip, 0, 0, 0);
-        
-        // Print the Hello World message
-        FntPrint("Hello, PlayStation World!\\n");
-        FntFlush(-1);
-        
-        // Swap buffers
-        DrawSync(0);
-        VSync(0);
-        PutDispEnv(&disp);
-        PutDrawEnv(&draw);
-    }
-    
-    return 0;
-}
-`;
-    fs.writeFileSync(mainCPath, mainCContent);
-
-    // Create Makefile
-    const makefileContent = `
-# PlayStation 1 Hello World Makefile
-
-# Include setup.mk for paths and compiler settings
-include setup.mk
-
-TARGET = hello_world
-
-OBJS = main.o
-
-all: $(TARGET).ps-exe
-
-$(TARGET).ps-exe: $(OBJS)
-	$(CC) $(LIBDIRS) -o $@ $^ -lpsxgpu -lpsxgte -lpsxpad
-
-%.o: %.c
-	$(CC) $(INCLUDE) -c $< -o $@
-
-clean:
-	rm -f $(OBJS) $(TARGET).ps-exe
-`;
-    fs.writeFileSync(makefilePath, makefileContent);
-    
-    // Create setup.mk
-    const setupMkContent = `
-# PSn00bSDK setup file
-# This file will be automatically updated by the extension with the correct paths
-# Do not modify the $(GCC_PATH), $(PLUGIN_SDK_PATH), and $(EMULATOR_PATH) variables
-
-# Paths - The extension will replace these variables with the correct paths
-PREFIX = mipsel-none-elf-
-PSN00B_BASE = $(PLUGIN_SDK_PATH)
-
-PSN00B_LIB = $(PSN00B_BASE)/lib
-PSN00B_INCLUDE = $(PSN00B_BASE)/include
-GCC_BASE = $(GCC_PATH)
-
-LIBDIRS = -L$(PSN00B_LIB)
-INCLUDE = -I$(PSN00B_INCLUDE)
-
-ELF2X = $(PSN00B_BASE)/bin/elf2x
-MKPSXISO = $(PSN00B_BASE)/bin/mkpsxiso
-EMULATOR_DIR = $(EMULATOR_PATH)
-
-GCC_BIN = $(GCC_BASE)/bin/
-
-CC = $(GCC_BIN)$(PREFIX)gcc
-CXX = $(GCC_BIN)$(PREFIX)g++
-AS = $(GCC_BIN)$(PREFIX)as
-AR = $(GCC_BIN)$(PREFIX)ar
-RANLIB = $(GCC_BIN)$(PREFIX)ranlib
-LD = $(GCC_BIN)$(PREFIX)ld
-
-# Folders - Directories for output files
-MKPSXISO_XML = cd.xml
-BIN_FOLDER = bin
-ISO_FOLDER = iso
-`;
-    fs.writeFileSync(setupMkPath, setupMkContent);
-    
-    console.log('Hello World template created successfully');
 }
 
 // Function to create a Hello World project
