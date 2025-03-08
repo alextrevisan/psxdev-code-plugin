@@ -14,6 +14,7 @@ const toolsPath = path.join(extensionPath, 'tools');
 const gccPath = path.join(toolsPath, 'gcc');
 const ps1SdkPath = path.join(toolsPath, 'psn00b_sdk');
 const emulatorPath = path.join(toolsPath, 'emulator');
+const gdbPath = path.join(toolsPath, 'gdb');
 const templatesPath = path.join(extensionPath, 'templates');
 const configPath = path.join(extensionPath, 'config.json');
 const toolsUrlsPath = path.join(extensionPath, 'tools-urls.json');
@@ -166,6 +167,7 @@ async function setupEnvironment(isManualSetup = false) {
     ensureDirectoryExists(gccPath);
     ensureDirectoryExists(ps1SdkPath);
     ensureDirectoryExists(emulatorPath);
+    ensureDirectoryExists(gdbPath);
     ensureDirectoryExists(templatesPath);
 
     // Load current configuration
@@ -175,12 +177,14 @@ async function setupEnvironment(isManualSetup = false) {
     const gccExists = fs.existsSync(gccPath) && fs.readdirSync(gccPath).length > 0;
     const ps1SdkExists = fs.existsSync(ps1SdkPath) && fs.readdirSync(ps1SdkPath).length > 0;
     const emulatorExists = fs.existsSync(emulatorPath) && fs.readdirSync(emulatorPath).length > 0;
+    const gdbExists = fs.existsSync(gdbPath) && fs.readdirSync(gdbPath).length > 0;
     
     // If all tools are included, mark them as installed
-    if (gccExists && ps1SdkExists && emulatorExists) {
+    if (gccExists && ps1SdkExists && emulatorExists && gdbExists) {
         config.tools.gcc.installed = true;
         config.tools.ps1sdk.installed = true;
         config.tools.emulator.installed = true;
+        config.tools.gdb = { installed: true };
         saveConfig(config);
         
         // Ensure the Hello World template is created
@@ -224,6 +228,18 @@ async function setupEnvironment(isManualSetup = false) {
         } else {
             // Emulator is optional, so don't fail if it can't be downloaded
             vscode.window.showWarningMessage('Failed to download PlayStation 1 emulator, but it is optional.');
+        }
+    }
+    
+    if (!gdbExists && downloadSuccess) {
+        vscode.window.showInformationMessage('Downloading GDB Multiarch debugger...');
+        const success = await downloadAndExtractTool('gdb_multiarch_win');
+        if (success) {
+            config.tools.gdb = { installed: true };
+            vscode.window.showInformationMessage('GDB Multiarch debugger downloaded successfully!');
+        } else {
+            // GDB is optional for basic usage, so don't fail if it can't be downloaded
+            vscode.window.showWarningMessage('Failed to download GDB Multiarch debugger, but it is optional for basic usage.');
         }
     }
     
@@ -412,7 +428,8 @@ async function createHelloWorld() {
             .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
             .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
             .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-            .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'));
+            .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
+            .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
         
         // Write the updated setup.mk
         fs.writeFileSync(setupMkPath, setupMkContent);
@@ -460,7 +477,8 @@ async function buildProject() {
                 .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
                 .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
                 .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'));
+                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
+                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
 
             // Write the updated setup.mk
             fs.writeFileSync(setupMkPath, setupMkContent);
@@ -474,7 +492,8 @@ async function buildProject() {
                 .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
                 .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
                 .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'));
+                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
+                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
 
             // Write the updated Makefile
             fs.writeFileSync(makefilePath, makefileContent);
@@ -532,7 +551,8 @@ async function runEmulator() {
                 .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
                 .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
                 .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'));
+                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
+                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
 
             // Write the updated setup.mk
             fs.writeFileSync(setupMkPath, setupMkContent);
@@ -590,7 +610,8 @@ async function generateISO() {
                 .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
                 .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
                 .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'));
+                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
+                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
 
             // Write the updated setup.mk
             fs.writeFileSync(setupMkPath, setupMkContent);

@@ -31,9 +31,16 @@
     "platform": "darwin"
   },
   "emulator_win": {
-    "url": "https://github.com/grumpycoders/pcsx-redux/releases/download/v0.8.0/pcsx-redux-win-x64-0.8.0.zip",
+    "url": "https://distrib.app/storage/assets/5e7/01c/7d7/8bd124b998c611aada96d6a3343d0ec2aed7994fd9a094ffebbc074/pcsx-redux-nightly-21863.20250308.2-x64.zip",
     "extractPath": "tools/emulator",
     "checkFile": "pcsx-redux.exe",
+    "optional": true,
+    "platform": "win32"
+  },
+  "gdb_multiarch_win": {
+    "url": "https://github.com/adamrehn/gdb-multiarch-windows/releases/download/gdb-11.2/gdb-11.2.zip",
+    "extractPath": "tools/gdb",
+    "checkFile": "gdb-multiarch.exe",
     "optional": true,
     "platform": "win32"
   }

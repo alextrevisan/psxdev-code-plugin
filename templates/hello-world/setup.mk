@@ -30,3 +30,20 @@ LD = $(GCC_BIN)$(PREFIX)ld
 MKPSXISO_XML = cd.xml
 BIN_FOLDER = bin
 ISO_FOLDER = iso
+
+# Emulator configuration with OS detection
+ifeq ($(OS),Windows_NT)
+    # Windows configuration
+    EMUBIN = $(EMULATOR_DIR)/pcsx-redux.exe
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Darwin)
+        # macOS configuration
+        EMUBIN = $(EMULATOR_DIR)/PCSX-Redux.app/Contents/MacOS/pcsx-redux
+    else
+        # Linux configuration
+        EMUBIN = $(EMULATOR_DIR)/pcsx-redux
+    endif
+endif
+
+EMU_CMD = $(EMUBIN) -iso iso/game.cue -debugger -fastboot -gdb

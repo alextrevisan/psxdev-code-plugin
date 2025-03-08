@@ -3,30 +3,6 @@ include setup.mk
 # Project target name
 TARGET = hello_world
 
-# Emulator configuration
-# The extension will automatically replace $(EMULATOR_DIR) with the correct path to the emulator
-# Uncomment the appropriate configuration for your system or add a custom one
-
-# PCSX-Redux (macOS)
-EMUBIN = $(EMULATOR_DIR)/PCSX-Redux.app/Contents/MacOS/pcsx-redux
-EMU_CMD = $(EMUBIN) -iso iso/$(TARGET).cue
-
-# DuckStation (macOS)
-#EMUBIN = $(EMULATOR_DIR)/DuckStation.app/Contents/MacOS/DuckStation
-#EMU_CMD = $(EMUBIN) -fastboot iso/$(TARGET).cue
-
-# DuckStation (Windows)
-#EMUBIN = $(EMULATOR_DIR)/duckstation.exe
-#EMU_CMD = $(EMUBIN) -fastboot iso/$(TARGET).cue
-
-# RetroArch (Windows)
-#EMUBIN = $(EMULATOR_DIR)/retroarch.exe
-#EMU_CMD = $(EMUBIN) -L swanstation_libretro.dll iso/$(TARGET).cue
-
-# PCSX-Redux (Windows)
-#EMUBIN = $(EMULATOR_DIR)/pcsx-redux.exe
-#EMU_CMD = $(EMUBIN) -iso iso/$(TARGET).cue
-
 # Searches for C, C++ and S (assembler) files in local directory
 CFILES		= $(notdir $(wildcard *.c))
 CPPFILES 	= $(notdir $(wildcard *.cpp))
