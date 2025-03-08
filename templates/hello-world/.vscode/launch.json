@@ -5,14 +5,14 @@
             "name": "(gdb) Iniciar",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/${workspaceFolderBasename}",
+            "program": "${workspaceFolder}/bin/hello_world",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "$(GDB_PATH)/bin/gdb-multiarch.exe",
+            "miDebuggerPath": "$(GDB_PATH)/gdb-multiarch.exe",
             "miDebuggerServerAddress": "localhost:3333"
         }
     ]

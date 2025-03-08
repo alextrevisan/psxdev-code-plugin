@@ -433,11 +433,37 @@ async function createHelloWorld() {
         
         // Write the updated setup.mk
         fs.writeFileSync(setupMkPath, setupMkContent);
-        
-        vscode.window.showInformationMessage('Hello World project created and configured with correct SDK paths.');
-    } else {
-        vscode.window.showWarningMessage('Hello World project created but setup.mk file not found. Build may fail.');
     }
+    
+    // Update launch.json with correct paths if it exists
+    const vscodeFolderPath = path.join(projectPath, '.vscode');
+    const launchJsonPath = path.join(vscodeFolderPath, 'launch.json');
+    if (fs.existsSync(launchJsonPath)) {
+        // Read the launch.json file
+        let launchJsonContent = fs.readFileSync(launchJsonPath, 'utf8');
+        
+        // Get the target name from the Makefile
+        const makefilePath = path.join(projectPath, 'Makefile');
+        let targetName = 'hello_world'; // Default target name
+        
+        if (fs.existsSync(makefilePath)) {
+            const makefileContent = fs.readFileSync(makefilePath, 'utf8');
+            const targetMatch = makefileContent.match(/TARGET\s*=\s*([\w_-]+)/);
+            if (targetMatch && targetMatch[1]) {
+                targetName = targetMatch[1];
+            }
+        }
+        
+        // Replace placeholders in launch.json with actual paths
+        launchJsonContent = launchJsonContent
+            .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'))
+            .replace(/\$\{workspaceFolder\}\/bin\/hello_world/g, `\${workspaceFolder}/bin/${targetName}`);
+        
+        // Write the updated launch.json
+        fs.writeFileSync(launchJsonPath, launchJsonContent);
+    }
+    
+    vscode.window.showInformationMessage('Hello World project created and configured with correct SDK paths.');
     
     // Open the main.c file
     const mainCPath = path.join(projectPath, 'main.c');
@@ -471,7 +497,7 @@ async function buildProject() {
         if (fs.existsSync(setupMkPath)) {
             // Read the setup.mk file
             let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
-
+            
             // Replace placeholders in setup.mk
             setupMkContent = setupMkContent
                 .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
@@ -486,7 +512,7 @@ async function buildProject() {
             // If setup.mk doesn't exist, update the Makefile directly
             // Read the Makefile
             let makefileContent = fs.readFileSync(makefilePath, 'utf8');
-
+            
             // Replace placeholders in the Makefile
             makefileContent = makefileContent
                 .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
@@ -497,6 +523,34 @@ async function buildProject() {
 
             // Write the updated Makefile
             fs.writeFileSync(makefilePath, makefileContent);
+        }
+
+        // Update launch.json with correct paths if it exists
+        const vscodeFolderPath = path.join(projectPath, '.vscode');
+        const launchJsonPath = path.join(vscodeFolderPath, 'launch.json');
+        if (fs.existsSync(launchJsonPath)) {
+            // Read the launch.json file
+            let launchJsonContent = fs.readFileSync(launchJsonPath, 'utf8');
+            
+            // Get the target name from the Makefile
+            const makefilePath = path.join(projectPath, 'Makefile');
+            let targetName = 'hello_world'; // Default target name
+            
+            if (fs.existsSync(makefilePath)) {
+                const makefileContent = fs.readFileSync(makefilePath, 'utf8');
+                const targetMatch = makefileContent.match(/TARGET\s*=\s*([\w_-]+)/);
+                if (targetMatch && targetMatch[1]) {
+                    targetName = targetMatch[1];
+                }
+            }
+            
+            // Replace placeholders in launch.json with actual paths
+            launchJsonContent = launchJsonContent
+                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'))
+                .replace(/\$\{workspaceFolder\}\/bin\/hello_world/g, `\${workspaceFolder}/bin/${targetName}`);
+            
+            // Write the updated launch.json
+            fs.writeFileSync(launchJsonPath, launchJsonContent);
         }
 
         // Create a terminal and run make
@@ -545,7 +599,7 @@ async function runEmulator() {
         if (fs.existsSync(setupMkPath)) {
             // Read the setup.mk file
             let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
-
+            
             // Replace placeholders in setup.mk
             setupMkContent = setupMkContent
                 .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
@@ -556,6 +610,34 @@ async function runEmulator() {
 
             // Write the updated setup.mk
             fs.writeFileSync(setupMkPath, setupMkContent);
+        }
+
+        // Update launch.json with correct paths if it exists
+        const vscodeFolderPath = path.join(projectPath, '.vscode');
+        const launchJsonPath = path.join(vscodeFolderPath, 'launch.json');
+        if (fs.existsSync(launchJsonPath)) {
+            // Read the launch.json file
+            let launchJsonContent = fs.readFileSync(launchJsonPath, 'utf8');
+            
+            // Get the target name from the Makefile
+            const makefilePath = path.join(projectPath, 'Makefile');
+            let targetName = 'hello_world'; // Default target name
+            
+            if (fs.existsSync(makefilePath)) {
+                const makefileContent = fs.readFileSync(makefilePath, 'utf8');
+                const targetMatch = makefileContent.match(/TARGET\s*=\s*([\w_-]+)/);
+                if (targetMatch && targetMatch[1]) {
+                    targetName = targetMatch[1];
+                }
+            }
+            
+            // Replace placeholders in launch.json with actual paths
+            launchJsonContent = launchJsonContent
+                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'))
+                .replace(/\$\{workspaceFolder\}\/bin\/hello_world/g, `\${workspaceFolder}/bin/${targetName}`);
+            
+            // Write the updated launch.json
+            fs.writeFileSync(launchJsonPath, launchJsonContent);
         }
 
         // Create a terminal and run make
@@ -604,7 +686,7 @@ async function generateISO() {
         if (fs.existsSync(setupMkPath)) {
             // Read the setup.mk file
             let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
-
+            
             // Replace placeholders in setup.mk
             setupMkContent = setupMkContent
                 .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
@@ -615,6 +697,34 @@ async function generateISO() {
 
             // Write the updated setup.mk
             fs.writeFileSync(setupMkPath, setupMkContent);
+        }
+
+        // Update launch.json with correct paths if it exists
+        const vscodeFolderPath = path.join(projectPath, '.vscode');
+        const launchJsonPath = path.join(vscodeFolderPath, 'launch.json');
+        if (fs.existsSync(launchJsonPath)) {
+            // Read the launch.json file
+            let launchJsonContent = fs.readFileSync(launchJsonPath, 'utf8');
+            
+            // Get the target name from the Makefile
+            const makefilePath = path.join(projectPath, 'Makefile');
+            let targetName = 'hello_world'; // Default target name
+            
+            if (fs.existsSync(makefilePath)) {
+                const makefileContent = fs.readFileSync(makefilePath, 'utf8');
+                const targetMatch = makefileContent.match(/TARGET\s*=\s*([\w_-]+)/);
+                if (targetMatch && targetMatch[1]) {
+                    targetName = targetMatch[1];
+                }
+            }
+            
+            // Replace placeholders in launch.json with actual paths
+            launchJsonContent = launchJsonContent
+                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'))
+                .replace(/\$\{workspaceFolder\}\/bin\/hello_world/g, `\${workspaceFolder}/bin/${targetName}`);
+            
+            // Write the updated launch.json
+            fs.writeFileSync(launchJsonPath, launchJsonContent);
         }
 
         // Create a terminal and run make
