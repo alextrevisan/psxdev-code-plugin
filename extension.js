@@ -376,164 +376,184 @@ async function createHelloWorld() {
 
 // Function to build the project
 async function buildProject() {
-    // Get the current file
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        throw new Error('No file is open');
+    try {
+        // Get the current workspace folder
+        const workspaceFolder = vscode.workspace.workspaceFolders[0];
+        if (!workspaceFolder) {
+            throw new Error('No workspace folder open');
+        }
+
+        const projectPath = workspaceFolder.uri.fsPath;
+
+        // Check if Makefile exists
+        const makefilePath = path.join(projectPath, 'Makefile');
+        if (!fs.existsSync(makefilePath)) {
+            throw new Error('Makefile not found in the project directory');
+        }
+
+        // Get the paths to the tools
+        const gccBinPath = path.join(gccPath, 'bin');
+        const sdkBinPath = path.join(ps1SdkPath, 'bin');
+
+        // Check if setup.mk exists and update it
+        const setupMkPath = path.join(projectPath, 'setup.mk');
+        if (fs.existsSync(setupMkPath)) {
+            // Read the setup.mk file
+            let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
+
+            // Replace placeholders in setup.mk
+            setupMkContent = setupMkContent
+                .replace(/\$\{GCC_PATH\}/g, gccPath.replace(/\\/g, '/'))
+                .replace(/\$\{PSN00B_SDK_PATH\}/g, ps1SdkPath.replace(/\\/g, '/'));
+
+            // Write the updated setup.mk
+            fs.writeFileSync(setupMkPath, setupMkContent);
+        } else {
+            // If setup.mk doesn't exist, update the Makefile directly
+            // Read the Makefile
+            let makefileContent = fs.readFileSync(makefilePath, 'utf8');
+
+            // Replace placeholders in the Makefile
+            makefileContent = makefileContent
+                .replace(/\$\{GCC_PATH\}/g, gccPath.replace(/\\/g, '/'))
+                .replace(/\$\{PSN00B_SDK_PATH\}/g, ps1SdkPath.replace(/\\/g, '/'));
+
+            // Write the updated Makefile
+            fs.writeFileSync(makefilePath, makefileContent);
+        }
+
+        // Create a terminal and run make
+        const terminal = vscode.window.createTerminal('PS1 Build');
+        terminal.show();
+
+        // Construct the PATH environment variable based on the platform
+        let pathEnv;
+        if (process.platform === 'win32') {
+            // Windows - PowerShell compatible command
+            pathEnv = `$env:PATH = "${gccBinPath.replace(/\\/g, '\\')};${sdkBinPath.replace(/\\/g, '\\')};$env:PATH";`;
+            terminal.sendText(`cd "${projectPath.replace(/\\/g, '\\')}"; ${pathEnv} make`);
+        } else {
+            // Unix-like systems (Linux, macOS)
+            pathEnv = `PATH="${gccBinPath}:${sdkBinPath}:$PATH"`;
+            terminal.sendText(`cd "${projectPath}" && ${pathEnv} make`);
+        }
+    } catch (error) {
+        throw error;
     }
-    
-    const document = editor.document;
-    const filePath = document.uri.fsPath;
-    const projectPath = path.dirname(filePath);
-    
-    // Check if Makefile exists
-    const makefilePath = path.join(projectPath, 'Makefile');
-    if (!fs.existsSync(makefilePath)) {
-        throw new Error('Makefile not found in the project directory');
-    }
-    
-    // Check if setup.mk exists
-    const setupMkPath = path.join(projectPath, 'setup.mk');
-    if (fs.existsSync(setupMkPath)) {
-        // Read the setup.mk
-        let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
-        
-        // Replace placeholders in the setup.mk
-        setupMkContent = setupMkContent
-            .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath)
-            .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath)
-            .replace(/\$\(GCC_PATH\)/g, gccPath)
-            .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath);
-        
-        // Write the updated setup.mk
-        fs.writeFileSync(setupMkPath, setupMkContent);
-    } else {
-        // If setup.mk doesn't exist, update the Makefile directly
-        // Read the Makefile
-        let makefileContent = fs.readFileSync(makefilePath, 'utf8');
-        
-        // Replace placeholders in the Makefile
-        makefileContent = makefileContent
-            .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath)
-            .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath)
-            .replace(/\$\(PSN00BSDK\/bin\/mipsel-none-elf-gcc\)/g, path.join(gccPath, 'bin', 'mipsel-none-elf-gcc'))
-            .replace(/\$\(PSN00BSDK\/bin\/elf2x\)/g, path.join(ps1SdkPath, 'bin', 'elf2x'));
-        
-        // Write the updated Makefile
-        fs.writeFileSync(makefilePath, makefileContent);
-    }
-    
-    // Create bin and iso directories if they don't exist
-    ensureDirectoryExists(path.join(projectPath, 'bin'));
-    ensureDirectoryExists(path.join(projectPath, 'iso'));
-    
-    // Create a terminal and run make
-    const terminal = vscode.window.createTerminal('PS1 Build');
-    terminal.show();
-    
-    // Add GCC bin and SDK bin to PATH for the terminal session
-    const gccBinPath = path.join(gccPath, 'bin');
-    const sdkBinPath = path.join(ps1SdkPath, 'bin');
-    const pathEnv = `PATH="${gccBinPath}:${sdkBinPath}:$PATH"`;
-    
-    // Run make with the updated PATH
-    terminal.sendText(`cd "${projectPath}" && ${pathEnv} make`);
 }
 
 // Function to run the emulator
 async function runEmulator() {
-    // Get the current file
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        throw new Error('No file is open');
+    try {
+        // Get the current workspace folder
+        const workspaceFolder = vscode.workspace.workspaceFolders[0];
+        if (!workspaceFolder) {
+            throw new Error('No workspace folder open');
+        }
+
+        const projectPath = workspaceFolder.uri.fsPath;
+
+        // Check if Makefile exists
+        const makefilePath = path.join(projectPath, 'Makefile');
+        if (!fs.existsSync(makefilePath)) {
+            throw new Error('Makefile not found in the project directory');
+        }
+
+        // Get the paths to the tools
+        const gccBinPath = path.join(gccPath, 'bin');
+        const sdkBinPath = path.join(ps1SdkPath, 'bin');
+
+        // Check if setup.mk exists and update it
+        const setupMkPath = path.join(projectPath, 'setup.mk');
+        if (fs.existsSync(setupMkPath)) {
+            // Read the setup.mk file
+            let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
+
+            // Replace placeholders in setup.mk
+            setupMkContent = setupMkContent
+                .replace(/\$\{GCC_PATH\}/g, gccPath.replace(/\\/g, '/'))
+                .replace(/\$\{PSN00B_SDK_PATH\}/g, ps1SdkPath.replace(/\\/g, '/'))
+                .replace(/\$\{EMULATOR_PATH\}/g, emulatorPath.replace(/\\/g, '/'));
+
+            // Write the updated setup.mk
+            fs.writeFileSync(setupMkPath, setupMkContent);
+        }
+
+        // Create a terminal and run make
+        const terminal = vscode.window.createTerminal('PS1 Emulator');
+        terminal.show();
+
+        // Construct the PATH environment variable based on the platform
+        let pathEnv;
+        if (process.platform === 'win32') {
+            // Windows - PowerShell compatible command
+            pathEnv = `$env:PATH = "${gccBinPath.replace(/\\/g, '\\')};${sdkBinPath.replace(/\\/g, '\\')};$env:PATH";`;
+            terminal.sendText(`cd "${projectPath.replace(/\\/g, '\\')}"; ${pathEnv} make run`);
+        } else {
+            // Unix-like systems (Linux, macOS)
+            pathEnv = `PATH="${gccBinPath}:${sdkBinPath}:$PATH"`;
+            terminal.sendText(`cd "${projectPath}" && ${pathEnv} make run`);
+        }
+    } catch (error) {
+        throw error;
     }
-    
-    const document = editor.document;
-    const filePath = document.uri.fsPath;
-    const projectPath = path.dirname(filePath);
-    
-    // Check if Makefile exists
-    const makefilePath = path.join(projectPath, 'Makefile');
-    if (!fs.existsSync(makefilePath)) {
-        throw new Error('Makefile not found in the project directory');
-    }
-    
-    // Check if setup.mk exists and update it
-    const setupMkPath = path.join(projectPath, 'setup.mk');
-    if (fs.existsSync(setupMkPath)) {
-        // Read the setup.mk
-        let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
-        
-        // Replace placeholders in the setup.mk
-        setupMkContent = setupMkContent
-            .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath)
-            .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath)
-            .replace(/\$\(GCC_PATH\)/g, gccPath)
-            .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath);
-        
-        // Write the updated setup.mk
-        fs.writeFileSync(setupMkPath, setupMkContent);
-    }
-    
-    // Create a terminal and run make
-    const terminal = vscode.window.createTerminal('PS1 Emulator');
-    terminal.show();
-    
-    // Add GCC bin and SDK bin to PATH for the terminal session
-    const gccBinPath = path.join(gccPath, 'bin');
-    const sdkBinPath = path.join(ps1SdkPath, 'bin');
-    const pathEnv = `PATH="${gccBinPath}:${sdkBinPath}:$PATH"`;
-    
-    // Run make run with the updated PATH
-    terminal.sendText(`cd "${projectPath}" && ${pathEnv} make run`);
 }
 
 // Function to generate ISO
 async function generateISO() {
-    // Get the current file
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        throw new Error('No file is open');
+    try {
+        // Get the current workspace folder
+        const workspaceFolder = vscode.workspace.workspaceFolders[0];
+        if (!workspaceFolder) {
+            throw new Error('No workspace folder open');
+        }
+
+        const projectPath = workspaceFolder.uri.fsPath;
+
+        // Check if Makefile exists
+        const makefilePath = path.join(projectPath, 'Makefile');
+        if (!fs.existsSync(makefilePath)) {
+            throw new Error('Makefile not found in the project directory');
+        }
+
+        // Get the paths to the tools
+        const gccBinPath = path.join(gccPath, 'bin');
+        const sdkBinPath = path.join(ps1SdkPath, 'bin');
+
+        // Check if setup.mk exists and update it
+        const setupMkPath = path.join(projectPath, 'setup.mk');
+        if (fs.existsSync(setupMkPath)) {
+            // Read the setup.mk file
+            let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
+
+            // Replace placeholders in setup.mk
+            setupMkContent = setupMkContent
+                .replace(/\$\{GCC_PATH\}/g, gccPath.replace(/\\/g, '/'))
+                .replace(/\$\{PSN00B_SDK_PATH\}/g, ps1SdkPath.replace(/\\/g, '/'))
+                .replace(/\$\{EMULATOR_PATH\}/g, emulatorPath.replace(/\\/g, '/'));
+
+            // Write the updated setup.mk
+            fs.writeFileSync(setupMkPath, setupMkContent);
+        }
+
+        // Create a terminal and run make
+        const terminal = vscode.window.createTerminal('PS1 ISO Generation');
+        terminal.show();
+
+        // Construct the PATH environment variable based on the platform
+        let pathEnv;
+        if (process.platform === 'win32') {
+            // Windows - PowerShell compatible command
+            pathEnv = `$env:PATH = "${gccBinPath.replace(/\\/g, '\\')};${sdkBinPath.replace(/\\/g, '\\')};$env:PATH";`;
+            terminal.sendText(`cd "${projectPath.replace(/\\/g, '\\')}"; ${pathEnv} make iso`);
+        } else {
+            // Unix-like systems (Linux, macOS)
+            pathEnv = `PATH="${gccBinPath}:${sdkBinPath}:$PATH"`;
+            terminal.sendText(`cd "${projectPath}" && ${pathEnv} make iso`);
+        }
+    } catch (error) {
+        throw error;
     }
-    
-    const document = editor.document;
-    const filePath = document.uri.fsPath;
-    const projectPath = path.dirname(filePath);
-    
-    // Check if Makefile exists
-    const makefilePath = path.join(projectPath, 'Makefile');
-    if (!fs.existsSync(makefilePath)) {
-        throw new Error('Makefile not found in the project directory');
-    }
-    
-    // Check if setup.mk exists and update it
-    const setupMkPath = path.join(projectPath, 'setup.mk');
-    if (fs.existsSync(setupMkPath)) {
-        // Read the setup.mk
-        let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
-        
-        // Replace placeholders in the setup.mk
-        setupMkContent = setupMkContent
-            .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath)
-            .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath)
-            .replace(/\$\(GCC_PATH\)/g, gccPath)
-            .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath);
-        
-        // Write the updated setup.mk
-        fs.writeFileSync(setupMkPath, setupMkContent);
-    }
-    
-    // Create a terminal and run make
-    const terminal = vscode.window.createTerminal('PS1 ISO Generator');
-    terminal.show();
-    
-    // Add GCC bin and SDK bin to PATH for the terminal session
-    const gccBinPath = path.join(gccPath, 'bin');
-    const sdkBinPath = path.join(ps1SdkPath, 'bin');
-    const pathEnv = `PATH="${gccBinPath}:${sdkBinPath}:$PATH"`;
-    
-    // Run make iso with the updated PATH
-    terminal.sendText(`cd "${projectPath}" && ${pathEnv} make iso`);
 }
 
 // Function to download and extract a tool

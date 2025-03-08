@@ -6,7 +6,7 @@
     "platform": "darwin"
   },
   "gcc_win": {
-    "url": "https://github.com/alextrevisan/mipsel-none-elf/releases/download/14.2.0/mipsel-none-elf-14.2.0-win.zip",
+    "url": "https://github.com/Lameguy64/PSn00bSDK/releases/download/v0.24/gcc-mipsel-none-elf-12.3.0-windows.zip",
     "extractPath": "tools/gcc",
     "checkFile": "bin/mipsel-none-elf-gcc.exe",
     "platform": "win32"
@@ -18,7 +18,7 @@
     "platform": "darwin"
   },
   "psn00b_sdk_win": {
-    "url": "https://github.com/alextrevisan/PSn00bSDK-Windows/releases/download/28-02-25/psn00b-sdk-windows.zip",
+    "url": "https://github.com/Lameguy64/PSn00bSDK/releases/download/v0.24/PSn00bSDK-0.24-win32.zip",
     "extractPath": "tools/psn00b_sdk",
     "checkFile": "bin/elf2x.exe",
     "platform": "win32"
