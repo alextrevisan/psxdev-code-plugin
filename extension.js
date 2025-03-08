@@ -419,56 +419,19 @@ async function createHelloWorld() {
     
     // Update setup.mk with correct paths
     const setupMkPath = path.join(projectPath, 'setup.mk');
-    if (fs.existsSync(setupMkPath)) {
-        // Read the setup.mk file
-        let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
-        
-        // Replace placeholders in setup.mk with actual paths
-        setupMkContent = setupMkContent
-            .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
-            .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-            .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-            .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
-            .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
-        
-        // Write the updated setup.mk
-        fs.writeFileSync(setupMkPath, setupMkContent);
-    }
+    await updatePathsInFile(setupMkPath);
     
-    // Update launch.json with correct paths if it exists
-    const vscodeFolderPath = path.join(projectPath, '.vscode');
-    const launchJsonPath = path.join(vscodeFolderPath, 'launch.json');
-    if (fs.existsSync(launchJsonPath)) {
-        // Read the launch.json file
-        let launchJsonContent = fs.readFileSync(launchJsonPath, 'utf8');
-        
-        // Get the target name from the Makefile
-        const makefilePath = path.join(projectPath, 'Makefile');
-        let targetName = 'hello_world'; // Default target name
-        
-        if (fs.existsSync(makefilePath)) {
-            const makefileContent = fs.readFileSync(makefilePath, 'utf8');
-            const targetMatch = makefileContent.match(/TARGET\s*=\s*([\w_-]+)/);
-            if (targetMatch && targetMatch[1]) {
-                targetName = targetMatch[1];
-            }
-        }
-        
-        // Replace placeholders in launch.json with actual paths
-        launchJsonContent = launchJsonContent
-            .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'))
-            .replace(/\$\{workspaceFolder\}\/bin\/hello_world/g, `\${workspaceFolder}/bin/${targetName}`);
-        
-        // Write the updated launch.json
-        fs.writeFileSync(launchJsonPath, launchJsonContent);
-    }
+    // Update launch.json with correct paths and target
+    await updateLaunchJson(projectPath);
     
     vscode.window.showInformationMessage('Hello World project created and configured with correct SDK paths.');
     
     // Open the main.c file
     const mainCPath = path.join(projectPath, 'main.c');
-    const document = await vscode.workspace.openTextDocument(mainCPath);
-    await vscode.window.showTextDocument(document);
+    if (fs.existsSync(mainCPath)) {
+        const document = await vscode.workspace.openTextDocument(mainCPath);
+        await vscode.window.showTextDocument(document);
+    }
 }
 
 // Function to build the project
@@ -494,65 +457,11 @@ async function buildProject() {
 
         // Check if setup.mk exists and update it
         const setupMkPath = path.join(projectPath, 'setup.mk');
-        if (fs.existsSync(setupMkPath)) {
-            // Read the setup.mk file
-            let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
-            
-            // Replace placeholders in setup.mk
-            setupMkContent = setupMkContent
-                .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
-                .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
-                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
-
-            // Write the updated setup.mk
-            fs.writeFileSync(setupMkPath, setupMkContent);
-        } else {
-            // If setup.mk doesn't exist, update the Makefile directly
-            // Read the Makefile
-            let makefileContent = fs.readFileSync(makefilePath, 'utf8');
-            
-            // Replace placeholders in the Makefile
-            makefileContent = makefileContent
-                .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
-                .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
-                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
-
-            // Write the updated Makefile
-            fs.writeFileSync(makefilePath, makefileContent);
-        }
-
-        // Update launch.json with correct paths if it exists
-        const vscodeFolderPath = path.join(projectPath, '.vscode');
-        const launchJsonPath = path.join(vscodeFolderPath, 'launch.json');
-        if (fs.existsSync(launchJsonPath)) {
-            // Read the launch.json file
-            let launchJsonContent = fs.readFileSync(launchJsonPath, 'utf8');
-            
-            // Get the target name from the Makefile
-            const makefilePath = path.join(projectPath, 'Makefile');
-            let targetName = 'hello_world'; // Default target name
-            
-            if (fs.existsSync(makefilePath)) {
-                const makefileContent = fs.readFileSync(makefilePath, 'utf8');
-                const targetMatch = makefileContent.match(/TARGET\s*=\s*([\w_-]+)/);
-                if (targetMatch && targetMatch[1]) {
-                    targetName = targetMatch[1];
-                }
-            }
-            
-            // Replace placeholders in launch.json with actual paths
-            launchJsonContent = launchJsonContent
-                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'))
-                .replace(/\$\{workspaceFolder\}\/bin\/hello_world/g, `\${workspaceFolder}/bin/${targetName}`);
-            
-            // Write the updated launch.json
-            fs.writeFileSync(launchJsonPath, launchJsonContent);
-        }
-
+        await updatePathsInFile(setupMkPath);
+        
+        // Update launch.json with correct paths and target
+        await updateLaunchJson(projectPath);
+        
         // Create a terminal and run make
         const terminal = vscode.window.createTerminal('PS1 Build');
         terminal.show();
@@ -596,50 +505,11 @@ async function runEmulator() {
 
         // Check if setup.mk exists and update it
         const setupMkPath = path.join(projectPath, 'setup.mk');
-        if (fs.existsSync(setupMkPath)) {
-            // Read the setup.mk file
-            let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
-            
-            // Replace placeholders in setup.mk
-            setupMkContent = setupMkContent
-                .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
-                .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
-                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
-
-            // Write the updated setup.mk
-            fs.writeFileSync(setupMkPath, setupMkContent);
-        }
-
-        // Update launch.json with correct paths if it exists
-        const vscodeFolderPath = path.join(projectPath, '.vscode');
-        const launchJsonPath = path.join(vscodeFolderPath, 'launch.json');
-        if (fs.existsSync(launchJsonPath)) {
-            // Read the launch.json file
-            let launchJsonContent = fs.readFileSync(launchJsonPath, 'utf8');
-            
-            // Get the target name from the Makefile
-            const makefilePath = path.join(projectPath, 'Makefile');
-            let targetName = 'hello_world'; // Default target name
-            
-            if (fs.existsSync(makefilePath)) {
-                const makefileContent = fs.readFileSync(makefilePath, 'utf8');
-                const targetMatch = makefileContent.match(/TARGET\s*=\s*([\w_-]+)/);
-                if (targetMatch && targetMatch[1]) {
-                    targetName = targetMatch[1];
-                }
-            }
-            
-            // Replace placeholders in launch.json with actual paths
-            launchJsonContent = launchJsonContent
-                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'))
-                .replace(/\$\{workspaceFolder\}\/bin\/hello_world/g, `\${workspaceFolder}/bin/${targetName}`);
-            
-            // Write the updated launch.json
-            fs.writeFileSync(launchJsonPath, launchJsonContent);
-        }
-
+        await updatePathsInFile(setupMkPath);
+        
+        // Update launch.json with correct paths and target
+        await updateLaunchJson(projectPath);
+        
         // Create a terminal and run make
         const terminal = vscode.window.createTerminal('PS1 Emulator');
         terminal.show();
@@ -683,50 +553,11 @@ async function generateISO() {
 
         // Check if setup.mk exists and update it
         const setupMkPath = path.join(projectPath, 'setup.mk');
-        if (fs.existsSync(setupMkPath)) {
-            // Read the setup.mk file
-            let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
-            
-            // Replace placeholders in setup.mk
-            setupMkContent = setupMkContent
-                .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
-                .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
-                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
-
-            // Write the updated setup.mk
-            fs.writeFileSync(setupMkPath, setupMkContent);
-        }
-
-        // Update launch.json with correct paths if it exists
-        const vscodeFolderPath = path.join(projectPath, '.vscode');
-        const launchJsonPath = path.join(vscodeFolderPath, 'launch.json');
-        if (fs.existsSync(launchJsonPath)) {
-            // Read the launch.json file
-            let launchJsonContent = fs.readFileSync(launchJsonPath, 'utf8');
-            
-            // Get the target name from the Makefile
-            const makefilePath = path.join(projectPath, 'Makefile');
-            let targetName = 'hello_world'; // Default target name
-            
-            if (fs.existsSync(makefilePath)) {
-                const makefileContent = fs.readFileSync(makefilePath, 'utf8');
-                const targetMatch = makefileContent.match(/TARGET\s*=\s*([\w_-]+)/);
-                if (targetMatch && targetMatch[1]) {
-                    targetName = targetMatch[1];
-                }
-            }
-            
-            // Replace placeholders in launch.json with actual paths
-            launchJsonContent = launchJsonContent
-                .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'))
-                .replace(/\$\{workspaceFolder\}\/bin\/hello_world/g, `\${workspaceFolder}/bin/${targetName}`);
-            
-            // Write the updated launch.json
-            fs.writeFileSync(launchJsonPath, launchJsonContent);
-        }
-
+        await updatePathsInFile(setupMkPath);
+        
+        // Update launch.json with correct paths and target
+        await updateLaunchJson(projectPath);
+        
         // Create a terminal and run make
         const terminal = vscode.window.createTerminal('PS1 ISO Generation');
         terminal.show();
@@ -745,6 +576,60 @@ async function generateISO() {
     } catch (error) {
         throw error;
     }
+}
+
+// Function to update paths in a file
+async function updatePathsInFile(filePath, targetName = null) {
+    if (!fs.existsSync(filePath)) {
+        return false;
+    }
+
+    let content = fs.readFileSync(filePath, 'utf8');
+    
+    // Replace placeholders with actual paths
+    content = content
+        .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
+        .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+        .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+        .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'))
+        .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'));
+    
+    fs.writeFileSync(filePath, content);
+    return true;
+}
+
+// Function to update launch.json with correct paths and target
+async function updateLaunchJson(projectPath) {
+    const vscodeFolderPath = path.join(projectPath, '.vscode');
+    const launchJsonPath = path.join(vscodeFolderPath, 'launch.json');
+    
+    if (!fs.existsSync(launchJsonPath)) {
+        return false;
+    }
+    
+    // Get the target name from the Makefile
+    const makefilePath = path.join(projectPath, 'Makefile');
+    let targetName = 'hello_world'; // Default target name
+    
+    if (fs.existsSync(makefilePath)) {
+        const makefileContent = fs.readFileSync(makefilePath, 'utf8');
+        const targetMatch = makefileContent.match(/TARGET\s*=\s*([\w_-]+)/);
+        if (targetMatch && targetMatch[1]) {
+            targetName = targetMatch[1];
+        }
+    }
+    
+    // Read and update the launch.json file
+    let launchJsonContent = fs.readFileSync(launchJsonPath, 'utf8');
+    
+    // Replace placeholders in launch.json with actual paths
+    launchJsonContent = launchJsonContent
+        .replace(/\$\(GDB_PATH\)/g, gdbPath.replace(/\\/g, '/'))
+        .replace(/\$\{workspaceFolder\}\/bin\/hello_world/g, `\${workspaceFolder}/bin/${targetName}`);
+    
+    // Write the updated launch.json
+    fs.writeFileSync(launchJsonPath, launchJsonContent);
+    return true;
 }
 
 // Function to download and extract a tool
