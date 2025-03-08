@@ -42,7 +42,7 @@ CFLAGS		= -Wa,--strip-local-absolute \
 			  -mgpopt \
 			  -mno-extern-sdata \
 			  -msoft-float \
-			  -O3
+			  -g
 
 # C++ compiler flags
 CPPFLAGS	= $(CFLAGS) -fno-exceptions \

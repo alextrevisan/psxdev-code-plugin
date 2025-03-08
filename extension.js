@@ -192,34 +192,31 @@ async function setupEnvironment(isManualSetup = false) {
     // Download missing tools
     let downloadSuccess = true;
     
+    // Show a single notification for all downloads
+    vscode.window.showInformationMessage('Downloading required files...');
+    
     if (!gccExists) {
-        vscode.window.showInformationMessage('Downloading GCC for PlayStation 1...');
         const success = await downloadAndExtractTool('gcc');
         if (success) {
             config.tools.gcc.installed = true;
-            vscode.window.showInformationMessage('GCC for PlayStation 1 downloaded successfully!');
         } else {
             downloadSuccess = false;
         }
     }
     
     if (!ps1SdkExists && downloadSuccess) {
-        vscode.window.showInformationMessage('Downloading PSn00bSDK for PlayStation 1...');
         const success = await downloadAndExtractTool('psn00b_sdk');
         if (success) {
             config.tools.ps1sdk.installed = true;
-            vscode.window.showInformationMessage('PSn00bSDK for PlayStation 1 downloaded successfully!');
         } else {
             downloadSuccess = false;
         }
     }
     
     if (!emulatorExists && downloadSuccess) {
-        vscode.window.showInformationMessage('Downloading PlayStation 1 emulator...');
         const success = await downloadAndExtractTool('emulator');
         if (success) {
             config.tools.emulator.installed = true;
-            vscode.window.showInformationMessage('PlayStation 1 emulator downloaded successfully!');
         } else {
             // Emulator is optional, so don't fail if it can't be downloaded
             vscode.window.showWarningMessage('Failed to download PlayStation 1 emulator, but it is optional.');
@@ -227,11 +224,9 @@ async function setupEnvironment(isManualSetup = false) {
     }
     
     if (!gdbExists && downloadSuccess) {
-        vscode.window.showInformationMessage('Downloading GDB Multiarch debugger...');
         const success = await downloadAndExtractTool('gdb_multiarch_win');
         if (success) {
             config.tools.gdb = { installed: true };
-            vscode.window.showInformationMessage('GDB Multiarch debugger downloaded successfully!');
         } else {
             // GDB is optional for basic usage, so don't fail if it can't be downloaded
             vscode.window.showWarningMessage('Failed to download GDB Multiarch debugger, but it is optional for basic usage.');
@@ -523,12 +518,9 @@ async function downloadAndExtractTool(toolName) {
         }
         
         // Download the tool
-        vscode.window.showInformationMessage(`Downloading ${toolName}...`);
         const response = await axios.get(url, { responseType: 'arraybuffer' });
         
         // Extract the tool
-        vscode.window.showInformationMessage(`Extracting ${toolName}...`);
-        
         // Check if the file is a DMG (macOS disk image)
         if (url.endsWith('.dmg')) {
             // Save the DMG file
@@ -647,10 +639,8 @@ async function downloadAndExtractTool(toolName) {
             });
         }
         
-        vscode.window.showInformationMessage(`${toolName} installed successfully.`);
         return true;
     } catch (error) {
-        vscode.window.showErrorMessage(`Failed to download and extract ${toolName}: ${error.message}`);
         console.error(error);
         return false;
     }
