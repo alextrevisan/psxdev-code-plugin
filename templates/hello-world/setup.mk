@@ -46,4 +46,4 @@ else
     endif
 endif
 
-EMU_CMD = $(EMUBIN) -iso iso/game.cue -debugger -fastboot -gdb
+EMU_CMD = $(EMUBIN) -iso iso/game.cue -debugger -safe -fastboot -gdb -interpreter
