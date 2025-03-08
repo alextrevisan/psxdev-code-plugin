@@ -249,8 +249,9 @@ async function createHelloWorldTemplate() {
     // Verificar se os arquivos do template já existem
     const mainCPath = path.join(helloWorldPath, 'main.c');
     const makefilePath = path.join(helloWorldPath, 'Makefile');
+    const setupMkPath = path.join(helloWorldPath, 'setup.mk');
     
-    if (fs.existsSync(mainCPath) && fs.existsSync(makefilePath)) {
+    if (fs.existsSync(mainCPath) && fs.existsSync(makefilePath) && fs.existsSync(setupMkPath)) {
         console.log('Hello World template already exists');
         return;
     }
@@ -314,28 +315,62 @@ int main() {
     const makefileContent = `
 # PlayStation 1 Hello World Makefile
 
-# Paths - these will be replaced by the extension with actual paths
-PSN00BSDK = $(PS1SDK_PATH)
-TARGET = hello_world
+# Include setup.mk for paths and compiler settings
+include setup.mk
 
-CC = $(PSN00BSDK)/bin/mipsel-none-elf-gcc
-CFLAGS = -I$(PSN00BSDK)/include -O2
-LDFLAGS = -L$(PSN00BSDK)/lib
+TARGET = hello_world
 
 OBJS = main.o
 
 all: $(TARGET).ps-exe
 
 $(TARGET).ps-exe: $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $^ -lpsxgpu -lpsxgte -lpsxpad
+	$(CC) $(LIBDIRS) -o $@ $^ -lpsxgpu -lpsxgte -lpsxpad
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(INCLUDE) -c $< -o $@
 
 clean:
 	rm -f $(OBJS) $(TARGET).ps-exe
 `;
     fs.writeFileSync(makefilePath, makefileContent);
+    
+    // Create setup.mk
+    const setupMkContent = `
+# PSn00bSDK setup file
+# Este arquivo será automaticamente atualizado pela extensão com os caminhos corretos
+# Não modifique as variáveis $(GCC_PATH), $(PLUGIN_SDK_PATH) e $(EMULATOR_PATH)
+
+# Paths - A extensão substituirá estas variáveis pelos caminhos corretos
+PREFIX = mipsel-none-elf-
+PSN00B_BASE = $(PLUGIN_SDK_PATH)
+
+PSN00B_LIB = $(PSN00B_BASE)/lib
+PSN00B_INCLUDE = $(PSN00B_BASE)/include
+GCC_BASE = $(GCC_PATH)
+
+LIBDIRS = -L$(PSN00B_LIB)
+INCLUDE = -I$(PSN00B_INCLUDE)
+
+ELF2X = $(PSN00B_BASE)/bin/elf2x
+MKPSXISO = $(PSN00B_BASE)/bin/mkpsxiso
+EMULATOR_DIR = $(EMULATOR_PATH)
+
+GCC_BIN = $(GCC_BASE)/bin/
+
+CC = $(GCC_BIN)$(PREFIX)gcc
+CXX = $(GCC_BIN)$(PREFIX)g++
+AS = $(GCC_BIN)$(PREFIX)as
+AR = $(GCC_BIN)$(PREFIX)ar
+RANLIB = $(GCC_BIN)$(PREFIX)ranlib
+LD = $(GCC_BIN)$(PREFIX)ld
+
+# Folders - Diretórios para arquivos de saída
+MKPSXISO_XML = cd.xml
+BIN_FOLDER = bin
+ISO_FOLDER = iso
+`;
+    fs.writeFileSync(setupMkPath, setupMkContent);
     
     console.log('Hello World template created successfully');
 }
@@ -349,24 +384,44 @@ async function createHelloWorld() {
     }
     
     const workspaceFolder = workspaceFolders[0].uri.fsPath;
-    const projectName = await vscode.window.showInputBox({
-        prompt: 'Enter project name',
-        placeHolder: 'hello_world',
-        value: 'hello_world'
-    });
     
-    if (!projectName) {
-        throw new Error('Project name is required');
+    // Confirm with user before overwriting files in the workspace folder
+    const confirmOverwrite = await vscode.window.showWarningMessage(
+        'This will create Hello World project files in the current workspace folder. Existing files may be overwritten.',
+        'Continue', 'Cancel'
+    );
+    
+    if (confirmOverwrite !== 'Continue') {
+        return;
     }
     
-    const projectPath = path.join(workspaceFolder, projectName);
-    
-    // Create project directory
-    await ensureDirectoryExists(projectPath);
+    // Use the current workspace folder as the project path
+    const projectPath = workspaceFolder;
     
     // Copy template files
     const templatePath = path.join(templatesPath, 'hello-world');
     await fse.copy(templatePath, projectPath);
+    
+    // Update setup.mk with correct paths
+    const setupMkPath = path.join(projectPath, 'setup.mk');
+    if (fs.existsSync(setupMkPath)) {
+        // Read the setup.mk file
+        let setupMkContent = fs.readFileSync(setupMkPath, 'utf8');
+        
+        // Replace placeholders in setup.mk with actual paths
+        setupMkContent = setupMkContent
+            .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
+            .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+            .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+            .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'));
+        
+        // Write the updated setup.mk
+        fs.writeFileSync(setupMkPath, setupMkContent);
+        
+        vscode.window.showInformationMessage('Hello World project created and configured with correct SDK paths.');
+    } else {
+        vscode.window.showWarningMessage('Hello World project created but setup.mk file not found. Build may fail.');
+    }
     
     // Open the main.c file
     const mainCPath = path.join(projectPath, 'main.c');
@@ -403,8 +458,10 @@ async function buildProject() {
 
             // Replace placeholders in setup.mk
             setupMkContent = setupMkContent
-                .replace(/\$\{GCC_PATH\}/g, gccPath.replace(/\\/g, '/'))
-                .replace(/\$\{PSN00B_SDK_PATH\}/g, ps1SdkPath.replace(/\\/g, '/'));
+                .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
+                .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+                .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'));
 
             // Write the updated setup.mk
             fs.writeFileSync(setupMkPath, setupMkContent);
@@ -415,8 +472,10 @@ async function buildProject() {
 
             // Replace placeholders in the Makefile
             makefileContent = makefileContent
-                .replace(/\$\{GCC_PATH\}/g, gccPath.replace(/\\/g, '/'))
-                .replace(/\$\{PSN00B_SDK_PATH\}/g, ps1SdkPath.replace(/\\/g, '/'));
+                .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
+                .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+                .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'));
 
             // Write the updated Makefile
             fs.writeFileSync(makefilePath, makefileContent);
@@ -471,9 +530,10 @@ async function runEmulator() {
 
             // Replace placeholders in setup.mk
             setupMkContent = setupMkContent
-                .replace(/\$\{GCC_PATH\}/g, gccPath.replace(/\\/g, '/'))
-                .replace(/\$\{PSN00B_SDK_PATH\}/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\{EMULATOR_PATH\}/g, emulatorPath.replace(/\\/g, '/'));
+                .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
+                .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+                .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'));
 
             // Write the updated setup.mk
             fs.writeFileSync(setupMkPath, setupMkContent);
@@ -528,9 +588,10 @@ async function generateISO() {
 
             // Replace placeholders in setup.mk
             setupMkContent = setupMkContent
-                .replace(/\$\{GCC_PATH\}/g, gccPath.replace(/\\/g, '/'))
-                .replace(/\$\{PSN00B_SDK_PATH\}/g, ps1SdkPath.replace(/\\/g, '/'))
-                .replace(/\$\{EMULATOR_PATH\}/g, emulatorPath.replace(/\\/g, '/'));
+                .replace(/\$\(GCC_PATH\)/g, gccPath.replace(/\\/g, '/'))
+                .replace(/\$\(PS1SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+                .replace(/\$\(PLUGIN_SDK_PATH\)/g, ps1SdkPath.replace(/\\/g, '/'))
+                .replace(/\$\(EMULATOR_PATH\)/g, emulatorPath.replace(/\\/g, '/'));
 
             // Write the updated setup.mk
             fs.writeFileSync(setupMkPath, setupMkContent);
@@ -643,9 +704,56 @@ async function downloadAndExtractTool(toolName) {
             // Remove the DMG file
             fs.unlinkSync(dmgPath);
         } else {
-            // Extract ZIP file
-            const zip = new AdmZip(Buffer.from(response.data));
-            zip.extractAllTo(extractPath, true);
+            // Special handling for PSN00B_SDK which contains a folder structure
+            if (toolName.includes('psn00b_sdk')) {
+                // Create a temporary directory for extraction
+                const tempExtractPath = path.join(os.tmpdir(), `${toolName}_temp`);
+                if (fs.existsSync(tempExtractPath)) {
+                    fse.removeSync(tempExtractPath);
+                }
+                fs.mkdirSync(tempExtractPath, { recursive: true });
+                
+                // Extract ZIP file to temp location
+                const zip = new AdmZip(Buffer.from(response.data));
+                zip.extractAllTo(tempExtractPath, true);
+                
+                // Clear the target directory
+                if (fs.existsSync(extractPath)) {
+                    fse.emptyDirSync(extractPath);
+                } else {
+                    fs.mkdirSync(extractPath, { recursive: true });
+                }
+                
+                // Find the SDK folder in the temp directory
+                const tempFiles = fs.readdirSync(tempExtractPath);
+                let sdkFolderName = null;
+                
+                // Look for the main SDK folder (usually named PSn00bSDK or similar)
+                for (const file of tempFiles) {
+                    const filePath = path.join(tempExtractPath, file);
+                    if (fs.statSync(filePath).isDirectory() && 
+                        (file.toLowerCase().includes('psn00b') || file.toLowerCase().includes('sdk'))) {
+                        sdkFolderName = file;
+                        break;
+                    }
+                }
+                
+                if (sdkFolderName) {
+                    // Move the SDK folder contents to the target location
+                    const sdkFolderPath = path.join(tempExtractPath, sdkFolderName);
+                    fse.copySync(sdkFolderPath, extractPath);
+                } else {
+                    // If no specific SDK folder found, copy everything
+                    fse.copySync(tempExtractPath, extractPath);
+                }
+                
+                // Clean up temp directory
+                fse.removeSync(tempExtractPath);
+            } else {
+                // Extract ZIP file directly for other tools
+                const zip = new AdmZip(Buffer.from(response.data));
+                zip.extractAllTo(extractPath, true);
+            }
         }
         
         // Check if the extraction was successful
