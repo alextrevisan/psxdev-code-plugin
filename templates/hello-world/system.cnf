@@ -1,5 +1,5 @@
-# Arquivo de configuração do PlayStation 1
-# Define o executável principal e configurações de memória
+# PlayStation 1 configuration file
+# Defines the main executable and memory settings
 
 BOOT = cdrom:\HELLO.EXE;1
 TCB = 4

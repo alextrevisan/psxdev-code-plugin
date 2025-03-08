@@ -4,8 +4,8 @@ include setup.mk
 TARGET = hello_world
 
 # Emulator configuration
-# A extensão substituirá automaticamente $(EMULATOR_DIR) pelo caminho correto do emulador
-# Descomente a configuração apropriada para o seu sistema ou adicione uma personalizada
+# The extension will automatically replace $(EMULATOR_DIR) with the correct path to the emulator
+# Uncomment the appropriate configuration for your system or add a custom one
 
 # PCSX-Redux (macOS)
 EMUBIN = $(EMULATOR_DIR)/PCSX-Redux.app/Contents/MacOS/pcsx-redux

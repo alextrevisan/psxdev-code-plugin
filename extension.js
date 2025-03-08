@@ -24,13 +24,13 @@ const toolsUrlsPath = path.join(extensionPath, 'tools-urls.json');
 function activate(context) {
     console.log('PlayStation 1 Development Extension is now active');
 
-    // Verificar se o ambiente já está configurado e configurar automaticamente se necessário
+    // Check if the environment is already configured and set it up automatically if needed
     checkAndSetupEnvironment();
 
     // Register the setup environment command
     let setupDisposable = vscode.commands.registerCommand('ps1-dev-extension.setupEnvironment', async function () {
         try {
-            await setupEnvironment(true); // true indica que é uma configuração manual
+            await setupEnvironment(true); // true indicates it's a manual configuration
             vscode.window.showInformationMessage('PlayStation 1 development environment setup complete!');
         } catch (error) {
             vscode.window.showErrorMessage(`Setup failed: ${error.message}`);
@@ -77,7 +77,7 @@ function activate(context) {
         }
     });
 
-    // Corrigir permissões
+    // Fix permissions
     const fixPermissionsDisposable = vscode.commands.registerCommand('ps1-dev-extension.fixPermissions', async () => {
         await fixToolPermissions();
     });
@@ -90,22 +90,22 @@ function activate(context) {
     context.subscriptions.push(fixPermissionsDisposable);
 }
 
-// Função para verificar e configurar o ambiente automaticamente
+// Function to check and set up the environment automatically
 async function checkAndSetupEnvironment() {
     try {
         const config = loadConfig();
         
-        // Verificar se as ferramentas já estão incluídas no plugin
+        // Check if tools are already included in the plugin
         const gccIncludedPath = path.join(extensionPath, 'tools', 'gcc');
         const ps1SdkIncludedPath = path.join(extensionPath, 'tools', 'psn00b_sdk');
         const emulatorIncludedPath = path.join(extensionPath, 'tools', 'emulator');
         
-        // Verificar se as ferramentas incluídas existem
+        // Check if the included tools exist
         const gccExists = fs.existsSync(gccIncludedPath) && fs.readdirSync(gccIncludedPath).length > 0;
         const ps1SdkExists = fs.existsSync(ps1SdkIncludedPath) && fs.readdirSync(ps1SdkIncludedPath).length > 0;
         const emulatorExists = fs.existsSync(emulatorIncludedPath) && fs.readdirSync(emulatorIncludedPath).length > 0;
         
-        // Se todas as ferramentas estiverem incluídas, marcar como instaladas
+        // If all tools are included, mark them as installed
         if (gccExists && ps1SdkExists) {
             config.tools.gcc.installed = true;
             config.tools.ps1sdk.installed = true;
@@ -113,24 +113,24 @@ async function checkAndSetupEnvironment() {
             saveConfig(config);
             console.log('PlayStation 1 development environment already set up with included tools');
             
-            // Garantir que o template Hello World esteja criado
+            // Ensure the Hello World template is created
             await createHelloWorldTemplate();
             return;
         }
         
-        // Se as ferramentas não estiverem incluídas, perguntar ao usuário se deseja baixá-las
+        // If tools are not included, ask the user if they want to download them
         if (!gccExists || !ps1SdkExists) {
             const downloadChoice = await vscode.window.showInformationMessage(
-                'Ferramentas necessárias para desenvolvimento PlayStation 1 não encontradas. Deseja baixá-las automaticamente?',
-                'Sim', 'Não'
+                'Required tools for PlayStation 1 development not found. Do you want to download them automatically?',
+                'Yes', 'No'
             );
             
-            if (downloadChoice === 'Sim') {
+            if (downloadChoice === 'Yes') {
                 await setupEnvironment(true);
             } else {
                 vscode.window.showWarningMessage(
-                    'O ambiente de desenvolvimento PlayStation 1 não está completamente configurado. ' +
-                    'Use o comando "PlayStation 1: Setup Development Environment" quando estiver pronto.'
+                    'The PlayStation 1 development environment is not completely configured. ' +
+                    'Use the "PlayStation 1: Setup Development Environment" command when you are ready.'
                 );
             }
         }
@@ -171,73 +171,72 @@ async function setupEnvironment(isManualSetup = false) {
     // Load current configuration
     const config = loadConfig();
     
-    // Verificar se as ferramentas já estão incluídas no plugin
+    // Check if tools are already included in the plugin
     const gccExists = fs.existsSync(gccPath) && fs.readdirSync(gccPath).length > 0;
     const ps1SdkExists = fs.existsSync(ps1SdkPath) && fs.readdirSync(ps1SdkPath).length > 0;
     const emulatorExists = fs.existsSync(emulatorPath) && fs.readdirSync(emulatorPath).length > 0;
     
-    // Se todas as ferramentas estiverem incluídas, marcar como instaladas
+    // If all tools are included, mark them as installed
     if (gccExists && ps1SdkExists && emulatorExists) {
         config.tools.gcc.installed = true;
         config.tools.ps1sdk.installed = true;
         config.tools.emulator.installed = true;
         saveConfig(config);
         
-        // Garantir que o template Hello World esteja criado
+        // Ensure the Hello World template is created
         await createHelloWorldTemplate();
         
-        vscode.window.showInformationMessage('Ferramentas já incluídas no plugin. Ambiente configurado com sucesso!');
+        vscode.window.showInformationMessage('Tools already included in the plugin. Environment configured successfully!');
         return;
     }
     
-    // Baixar ferramentas que estão faltando
+    // Download missing tools
     let downloadSuccess = true;
     
     if (!gccExists) {
-        vscode.window.showInformationMessage('Baixando GCC para PlayStation 1...');
+        vscode.window.showInformationMessage('Downloading GCC for PlayStation 1...');
         const success = await downloadAndExtractTool('gcc');
         if (success) {
             config.tools.gcc.installed = true;
-            vscode.window.showInformationMessage('GCC para PlayStation 1 baixado com sucesso!');
+            vscode.window.showInformationMessage('GCC for PlayStation 1 downloaded successfully!');
         } else {
             downloadSuccess = false;
         }
     }
     
-    if (!ps1SdkExists) {
-        vscode.window.showInformationMessage('Baixando SDK do PlayStation 1...');
+    if (!ps1SdkExists && downloadSuccess) {
+        vscode.window.showInformationMessage('Downloading PSn00bSDK for PlayStation 1...');
         const success = await downloadAndExtractTool('psn00b_sdk');
         if (success) {
             config.tools.ps1sdk.installed = true;
-            vscode.window.showInformationMessage('SDK do PlayStation 1 baixado com sucesso!');
+            vscode.window.showInformationMessage('PSn00bSDK for PlayStation 1 downloaded successfully!');
         } else {
             downloadSuccess = false;
         }
     }
     
-    if (!emulatorExists) {
-        vscode.window.showInformationMessage('Baixando Emulador do PlayStation 1...');
+    if (!emulatorExists && downloadSuccess) {
+        vscode.window.showInformationMessage('Downloading PlayStation 1 emulator...');
         const success = await downloadAndExtractTool('emulator');
         if (success) {
             config.tools.emulator.installed = true;
-            vscode.window.showInformationMessage('Emulador do PlayStation 1 baixado com sucesso!');
+            vscode.window.showInformationMessage('PlayStation 1 emulator downloaded successfully!');
         } else {
-            // Emulador é opcional, então não afeta o downloadSuccess
-            vscode.window.showWarningMessage('Não foi possível baixar o emulador, mas ele é opcional.');
+            // Emulator is optional, so don't fail if it can't be downloaded
+            vscode.window.showWarningMessage('Failed to download PlayStation 1 emulator, but it is optional.');
         }
     }
     
+    // Save the configuration
     saveConfig(config);
     
+    // Create the Hello World template
+    await createHelloWorldTemplate();
+    
     if (downloadSuccess) {
-        // Garantir que o template Hello World esteja criado
-        await createHelloWorldTemplate();
-        vscode.window.showInformationMessage('Ambiente de desenvolvimento PlayStation 1 configurado com sucesso!');
+        vscode.window.showInformationMessage('PlayStation 1 development environment setup complete!');
     } else {
-        vscode.window.showWarningMessage(
-            'Algumas ferramentas não puderam ser baixadas automaticamente. ' +
-            'Por favor, adicione-as manualmente ao diretório "tools" do plugin.'
-        );
+        vscode.window.showErrorMessage('Failed to set up PlayStation 1 development environment. Check the logs for details.');
     }
 }
 
@@ -246,7 +245,7 @@ async function createHelloWorldTemplate() {
     const helloWorldPath = path.join(templatesPath, 'hello-world');
     await ensureDirectoryExists(helloWorldPath);
 
-    // Verificar se os arquivos do template já existem
+    // Check if the template files already exist
     const mainCPath = path.join(helloWorldPath, 'main.c');
     const makefilePath = path.join(helloWorldPath, 'Makefile');
     const setupMkPath = path.join(helloWorldPath, 'setup.mk');
@@ -338,10 +337,10 @@ clean:
     // Create setup.mk
     const setupMkContent = `
 # PSn00bSDK setup file
-# Este arquivo será automaticamente atualizado pela extensão com os caminhos corretos
-# Não modifique as variáveis $(GCC_PATH), $(PLUGIN_SDK_PATH) e $(EMULATOR_PATH)
+# This file will be automatically updated by the extension with the correct paths
+# Do not modify the $(GCC_PATH), $(PLUGIN_SDK_PATH), and $(EMULATOR_PATH) variables
 
-# Paths - A extensão substituirá estas variáveis pelos caminhos corretos
+# Paths - The extension will replace these variables with the correct paths
 PREFIX = mipsel-none-elf-
 PSN00B_BASE = $(PLUGIN_SDK_PATH)
 
@@ -365,7 +364,7 @@ AR = $(GCC_BIN)$(PREFIX)ar
 RANLIB = $(GCC_BIN)$(PREFIX)ranlib
 LD = $(GCC_BIN)$(PREFIX)ld
 
-# Folders - Diretórios para arquivos de saída
+# Folders - Directories for output files
 MKPSXISO_XML = cd.xml
 BIN_FOLDER = bin
 ISO_FOLDER = iso
@@ -385,7 +384,7 @@ async function createHelloWorld() {
     
     const workspaceFolder = workspaceFolders[0].uri.fsPath;
     
-    // Confirm with user before overwriting files in the workspace folder
+    // Confirm with the user before overwriting files in the workspace folder
     const confirmOverwrite = await vscode.window.showWarningMessage(
         'This will create Hello World project files in the current workspace folder. Existing files may be overwritten.',
         'Continue', 'Cancel'

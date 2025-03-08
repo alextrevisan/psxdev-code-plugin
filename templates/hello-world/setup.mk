@@ -1,8 +1,8 @@
 # PSn00bSDK setup file
-# Este arquivo será automaticamente atualizado pela extensão com os caminhos corretos
-# Não modifique as variáveis $(PS1SDK_PATH), $(GCC_PATH) e $(EMULATOR_PATH)
+# This file will be automatically updated by the extension with the correct paths
+# Do not modify the $(PS1SDK_PATH), $(GCC_PATH) and $(EMULATOR_PATH) variables
 
-# Paths - A extensão substituirá estas variáveis pelos caminhos corretos
+# Paths - The extension will replace these variables with the correct paths
 PREFIX = mipsel-none-elf-
 PSN00B_BASE = $(PLUGIN_SDK_PATH)
 
@@ -26,7 +26,7 @@ AR = $(GCC_BIN)$(PREFIX)ar
 RANLIB = $(GCC_BIN)$(PREFIX)ranlib
 LD = $(GCC_BIN)$(PREFIX)ld
 
-# Folders - Diretórios para arquivos de saída
+# Folders - Directories for output files
 MKPSXISO_XML = cd.xml
 BIN_FOLDER = bin
 ISO_FOLDER = iso

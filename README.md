@@ -1,144 +1,144 @@
 # PlayStation 1 Development Extension for VSCode/Windsurf
 
-Esta extensão fornece ferramentas para desenvolvimento de jogos e aplicativos para PlayStation 1, incluindo:
+This extension provides tools for developing games and applications for PlayStation 1, including:
 
-- GCC, SDK do PlayStation 1 e emulador incluídos
-- Criação de projetos Hello World
-- Compilação de projetos para PlayStation 1
-- Geração de ISO para projetos
-- Execução de projetos no emulador
+- GCC, PlayStation 1 SDK, and emulator included
+- Creation of Hello World projects
+- Compilation of projects for PlayStation 1
+- ISO generation for projects
+- Running projects in the emulator
 
-## Instalação
+## Installation
 
-Como esta é uma extensão local, você precisará:
+As this is a local extension, you will need to:
 
-1. Copiar esta pasta para o diretório de extensões do VSCode:
+1. Copy this folder to the VSCode extensions directory:
    - Windows: `%USERPROFILE%\.vscode\extensions`
    - macOS: `~/.vscode/extensions`
    - Linux: `~/.vscode/extensions`
 
-2. Reiniciar o VSCode/Windsurf
+2. Restart VSCode/Windsurf
 
-## Ferramentas Incluídas
+## Included Tools
 
-Esta extensão inclui as seguintes ferramentas para desenvolvimento PlayStation 1:
+This extension includes the following tools for PlayStation 1 development:
 
-- **GCC para MIPS**: Compilador GCC configurado para o processador MIPS R3000A do PlayStation 1
-- **PSN00B SDK**: SDK para desenvolvimento de jogos PlayStation 1
-- **Emulador**: Um emulador de PlayStation 1 (opcional)
+- **GCC for MIPS**: GCC compiler configured for the PlayStation 1's MIPS R3000A processor
+- **PSN00B SDK**: SDK for PlayStation 1 game development
+- **Emulator**: A PlayStation 1 emulator (optional)
 
-## Funcionalidades
+## Features
 
-- **Configuração Automática do Ambiente**: A extensão configura automaticamente o ambiente de desenvolvimento PlayStation 1 ao ser carregada.
-- **Download Automático de Ferramentas**: Se as ferramentas não estiverem incluídas, a extensão oferecerá a opção de baixá-las automaticamente.
-- **Criação de Projetos**: Crie facilmente projetos "Hello World" para PlayStation 1.
-- **Compilação de Projetos**: Compile seus projetos PlayStation 1 com um único comando.
-- **Geração de ISO**: Gere arquivos ISO para seus projetos, prontos para serem executados em emuladores ou hardware real.
-- **Execução no Emulator**: Execute seus projetos compilados diretamente no emulador.
+- **Automatic Environment Setup**: The extension automatically configures the PlayStation 1 development environment when loaded.
+- **Automatic Tool Downloads**: If the tools are not included, the extension will offer the option to download them automatically.
+- **Project Creation**: Easily create "Hello World" projects for PlayStation 1.
+- **Project Compilation**: Compile your PlayStation 1 projects with a single command.
+- **ISO Generation**: Generate ISO files for your projects, ready to be run on emulators or real hardware.
+- **Emulator Execution**: Run your compiled projects directly in the emulator.
 
-## Requisitos
+## Requirements
 
-- Visual Studio Code ou Windsurf
-- Sistema operacional: Windows, macOS ou Linux
+- Visual Studio Code or Windsurf
+- Operating system: Windows, macOS, or Linux
 
-## Instalação
+## Installation
 
-1. Instale a extensão através do Marketplace do VS Code ou Windsurf.
-2. A extensão verificará automaticamente se as ferramentas necessárias estão incluídas.
-3. Se alguma ferramenta estiver faltando, você será notificado para adicioná-la ao diretório `tools` da extensão.
+1. Install the extension through the VS Code or Windsurf Marketplace.
+2. The extension will automatically check if the necessary tools are included.
+3. If any tools are missing, you will be notified to add them to the extension's `tools` directory.
 
-## Uso
+## Usage
 
-### Configuração do Ambiente
+### Environment Setup
 
-A extensão configura automaticamente o ambiente de desenvolvimento ao ser carregada. Se você precisar configurar manualmente, use o comando:
+The extension automatically configures the development environment when loaded. If you need to set it up manually, use the command:
 
 ```
 PlayStation 1: Setup Development Environment
 ```
 
-### Criação de Projeto Hello World
+### Creating a Hello World Project
 
-Para criar um novo projeto "Hello World" para PlayStation 1:
+To create a new "Hello World" project for PlayStation 1:
 
-1. Abra uma pasta no VS Code onde deseja criar o projeto.
-2. Execute o comando `PS1: Create Hello World Project`.
-3. Digite o nome do projeto quando solicitado.
-4. O projeto será criado com um arquivo `main.c`, `Makefile`, `setup.mk` e outros arquivos necessários.
+1. Open a folder in VS Code where you want to create the project.
+2. Run the command `PS1: Create Hello World Project`.
+3. Type the project name when prompted.
+4. The project will be created with a `main.c`, `Makefile`, `setup.mk`, and other necessary files.
 
-### Compilação de Projeto
+### Compiling a Project
 
-Para compilar seu projeto PlayStation 1:
+To compile your PlayStation 1 project:
 
-1. Abra um arquivo do projeto (por exemplo, `main.c`).
-2. Execute o comando `PS1: Build Project`.
-3. O projeto será compilado usando o Makefile, gerando arquivos binários na pasta `bin`.
+1. Open a project file (e.g., `main.c`).
+2. Run the command `PS1: Build Project`.
+3. The project will be compiled using the Makefile, generating binary files in the `bin` folder.
 
-### Geração de ISO
+### Generating an ISO
 
-Para gerar um arquivo ISO do seu projeto:
+To generate an ISO file for your project:
 
-1. Compile o projeto primeiro.
-2. Execute o comando `PS1: Generate ISO`.
-3. O arquivo ISO e CUE serão gerados na pasta `iso` do seu projeto.
+1. Compile the project first.
+2. Run the command `PS1: Generate ISO`.
+3. The ISO and CUE files will be generated in the project's `iso` folder.
 
-### Execução no Emulador
+### Running in the Emulator
 
-Para executar seu projeto no emulador:
+To run your project in the emulator:
 
-1. Compile o projeto e gere o ISO primeiro.
-2. Execute o comando `PS1: Run in Emulator`.
-3. O emulador configurado no Makefile será iniciado com o arquivo ISO gerado.
+1. Compile the project and generate the ISO first.
+2. Run the command `PS1: Run in Emulator`.
+3. The emulator configured in the Makefile will be launched with the generated ISO file.
 
-## Estrutura do Projeto
+## Project Structure
 
-Os projetos criados com esta extensão têm a seguinte estrutura:
+Projects created with this extension have the following structure:
 
 ```
-projeto/
-├── main.c           - Código fonte principal
-├── Makefile         - Makefile principal do projeto
-├── setup.mk         - Configurações do ambiente de compilação
-├── system.cnf       - Arquivo de configuração do PlayStation
-├── cd.xml           - Configuração para geração de ISO
-├── bin/             - Arquivos binários compilados
-└── iso/             - Arquivos ISO gerados
+project/
+├── main.c           - Main source code
+├── Makefile         - Main Makefile for the project
+├── setup.mk         - Build environment settings
+├── system.cnf       - PlayStation configuration file
+├── cd.xml           - ISO generation settings
+├── bin/             - Compiled binary files
+└── iso/             - Generated ISO files
 ```
 
-## Personalização do Makefile
+## Customizing the Makefile
 
-O Makefile gerado inclui várias configurações que você pode personalizar:
+The generated Makefile includes several settings that you can customize:
 
-- **Emulador**: Você pode configurar diferentes emuladores no Makefile.
-- **Organização de Código**: O Makefile suporta organização em diretórios como `engine/` e `ui/`.
-- **Flags de Compilação**: Diversas flags de otimização e configuração já estão incluídas.
+- **Emulator**: You can configure different emulators in the Makefile.
+- **Code Organization**: The Makefile supports organizing code in directories like `engine/` and `ui/`.
+- **Compilation Flags**: Various optimization and configuration flags are already included.
 
-## Estrutura de Diretórios
+## Directory Structure
 
 ```
 ps1-dev-extension/
 ├── tools/
-│   ├── gcc/          - Compilador GCC para MIPS
-│   ├── psn00b_sdk/   - SDK PlayStation 1
-│   └── emulator/     - Emulador PlayStation 1 (opcional)
+│   ├── gcc/          - GCC compiler for MIPS
+│   ├── psn00b_sdk/   - PlayStation 1 SDK
+│   └── emulator/     - PlayStation 1 emulator (optional)
 └── templates/
-    └── hello-world/  - Template de projeto Hello World
+    └── hello-world/  - Hello World project template
 ```
 
-## Notas
+## Notes
 
-- Se você encontrar problemas com a compilação, verifique se o compilador GCC e o SDK estão corretamente instalados no diretório `tools`.
-- Para adicionar um emulador, coloque o executável do emulador no diretório `tools/emulator/`.
+- If you encounter compilation issues, ensure that the GCC compiler and SDK are correctly installed in the `tools` directory.
+- To add an emulator, place the emulator executable in the `tools/emulator/` directory.
 
-## Notas de Lançamento
+## Release Notes
 
 ### 0.2.0
 
-- Adicionado suporte para download automático de ferramentas
-- Novo formato de Makefile com suporte a geração de ISO e múltiplos emuladores
-- Adicionado comando para gerar ISO
-- Atualizado o comando de execução para usar o comando 'make run'
+- Added support for automatic tool downloads
+- New Makefile format with support for ISO generation and multiple emulators
+- Added command to generate ISO
+- Updated the run command to use the 'make run' command
 
 ### 0.1.0
 
-Lançamento inicial com funcionalidade básica.
+Initial release with basic functionality.
