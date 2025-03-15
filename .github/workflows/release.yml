@@ -28,6 +28,11 @@ jobs:
 
       - name: Package extension
         run: vsce package
+        
+      - name: Rename VSIX file
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          mv ps1-dev-extension-$VERSION.vsix ps1-dev-extension.vsix
 
       - name: Get version from tag
         id: get_version
@@ -37,7 +42,7 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: ps1-dev-extension-*.vsix
+          files: ps1-dev-extension.vsix
           name: Release ${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: false

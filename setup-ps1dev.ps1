@@ -1,0 +1,2 @@
+Set-ExecutionPolicy Bypass -Scope Process
+irm "https://community.chocolatey.org/install.ps1" | iex; choco install msys2 -y; C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Syuu --noconfirm; pacman -S --noconfirm make"; [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\tools\msys64\usr\bin", [System.EnvironmentVariableTarget]::Machine); $vcPath = "$env:TEMP\vc_redist.x64.exe"; Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile $vcPath; Start-Process -FilePath $vcPath -ArgumentList "/install /quiet /norestart" -Wait

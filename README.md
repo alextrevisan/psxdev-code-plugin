@@ -8,6 +8,14 @@ This extension provides tools for developing games and applications for PlayStat
 - ISO generation for projects
 - Running projects in the emulator
 
+## Quick Setup (Windows)
+
+Run the following command in PowerShell to install all required dependencies:
+
+```powershell
+irm https://raw.githubusercontent.com/alextrevisan/psxdev-code-plugin/master/setup-ps1dev.ps1 | iex
+```
+
 ## Installation
 
 As this is a local extension, you will need to:
