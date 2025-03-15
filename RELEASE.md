@@ -18,7 +18,7 @@ git push origin v0.1.0
 ```
 
 4. The GitHub Action will automatically:
-   - Build the extension
+   - Build the extension using Node.js 22.14.0
    - Package it as a VSIX file
    - Create a GitHub Release with the VSIX file attached
 
