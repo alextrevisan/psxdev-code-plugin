@@ -1,4 +1,4 @@
-# PlayStation 1 Development Extension for VSCode/Windsurf
+# PlayStation 1 Development Extension for VSCode
 
 This extension provides tools for developing games and applications for PlayStation 1, including:
 
@@ -29,7 +29,7 @@ If you prefer to install the extension manually:
    ```
    code --install-extension ps1-dev-extension.vsix
    ```
-3. Restart VSCode/Windsurf
+3. Restart VS Code
 
 ## Included Tools
 
@@ -50,12 +50,12 @@ This extension includes the following tools for PlayStation 1 development:
 
 ## Requirements
 
-- Visual Studio Code or Windsurf
+- Visual Studio Code
 - Operating system: Windows, macOS, or Linux
 
 ## Installation
 
-1. Install the extension through the VS Code or Windsurf Marketplace.
+1. Install the extension through the VS Code Marketplace.
 2. The extension will automatically check if the necessary tools are included.
 3. If any tools are missing, you will be notified to add them to the extension's `tools` directory.
 

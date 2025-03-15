@@ -1,4 +1,4 @@
-# Script to package the PS1 Development extension for VSCode/Windsurf
+# Script to package the PS1 Development extension for VSCode
 
 # Check directory sizes
 Write-Host "Checking directory sizes..."
