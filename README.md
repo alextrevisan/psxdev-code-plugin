@@ -10,22 +10,26 @@ This extension provides tools for developing games and applications for PlayStat
 
 ## Quick Setup (Windows)
 
-Run the following command in PowerShell to install all required dependencies:
+Run the following command in PowerShell to install all required dependencies and the extension:
 
 ```powershell
 irm https://raw.githubusercontent.com/alextrevisan/psxdev-code-plugin/master/setup-ps1dev.ps1 | iex
 ```
 
-## Installation
+This will:
+1. Install all required dependencies (MSYS2, make, Visual C++ Redistributable)
+2. Download and install the PS1 Development extension in VS Code
 
-As this is a local extension, you will need to:
+## Manual Installation
 
-1. Copy this folder to the VSCode extensions directory:
-   - Windows: `%USERPROFILE%\.vscode\extensions`
-   - macOS: `~/.vscode/extensions`
-   - Linux: `~/.vscode/extensions`
+If you prefer to install the extension manually:
 
-2. Restart VSCode/Windsurf
+1. Download the latest release from [GitHub Releases](https://github.com/alextrevisan/psxdev-code-plugin/releases/latest/download/ps1-dev-extension.vsix)
+2. Install it in VS Code using the command:
+   ```
+   code --install-extension ps1-dev-extension.vsix
+   ```
+3. Restart VSCode/Windsurf
 
 ## Included Tools
 
