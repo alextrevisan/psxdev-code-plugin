@@ -160,7 +160,6 @@ function saveConfig(config) {
 
 // Function to set up the development environment
 async function setupEnvironment(isManualSetup = false) {
-    // Create necessary directories
     ensureDirectoryExists(toolsPath);
     ensureDirectoryExists(gccPath);
     ensureDirectoryExists(ps1SdkPath);
@@ -168,16 +167,13 @@ async function setupEnvironment(isManualSetup = false) {
     ensureDirectoryExists(gdbPath);
     ensureDirectoryExists(templatesPath);
 
-    // Load current configuration
     const config = loadConfig();
     
-    // Check if tools are already included in the plugin
     const gccExists = fs.existsSync(gccPath) && fs.readdirSync(gccPath).length > 0;
     const ps1SdkExists = fs.existsSync(ps1SdkPath) && fs.readdirSync(ps1SdkPath).length > 0;
     const emulatorExists = fs.existsSync(emulatorPath) && fs.readdirSync(emulatorPath).length > 0;
     const gdbExists = fs.existsSync(gdbPath) && fs.readdirSync(gdbPath).length > 0;
     
-    // If all tools are included, mark them as installed
     if (gccExists && ps1SdkExists && emulatorExists && gdbExists) {
         config.tools.gcc.installed = true;
         config.tools.ps1sdk.installed = true;
@@ -189,10 +185,8 @@ async function setupEnvironment(isManualSetup = false) {
         return;
     }
     
-    // Download missing tools
     let downloadSuccess = true;
     
-    // Show a single notification for all downloads
     vscode.window.showInformationMessage('Downloading required files...');
     
     if (!gccExists) {
@@ -218,7 +212,6 @@ async function setupEnvironment(isManualSetup = false) {
         if (success) {
             config.tools.emulator.installed = true;
         } else {
-            // Emulator is optional, so don't fail if it can't be downloaded
             vscode.window.showWarningMessage('Failed to download PlayStation 1 emulator, but it is optional.');
         }
     }
@@ -228,12 +221,10 @@ async function setupEnvironment(isManualSetup = false) {
         if (success) {
             config.tools.gdb = { installed: true };
         } else {
-            // GDB is optional for basic usage, so don't fail if it can't be downloaded
             vscode.window.showWarningMessage('Failed to download GDB Multiarch debugger, but it is optional for basic usage.');
         }
     }
     
-    // Save the configuration
     saveConfig(config);
     
     if (downloadSuccess) {
@@ -290,7 +281,6 @@ async function createHelloWorld() {
 // Function to build the project
 async function buildProject() {
     try {
-        // Get the current workspace folder
         const workspaceFolder = vscode.workspace.workspaceFolders[0];
         if (!workspaceFolder) {
             throw new Error('No workspace folder open');
@@ -298,35 +288,27 @@ async function buildProject() {
 
         const projectPath = workspaceFolder.uri.fsPath;
 
-        // Check if Makefile exists
         const makefilePath = path.join(projectPath, 'Makefile');
         if (!fs.existsSync(makefilePath)) {
             throw new Error('Makefile not found in the project directory');
         }
 
-        // Get the paths to the tools
         const gccBinPath = path.join(gccPath, 'bin');
         const sdkBinPath = path.join(ps1SdkPath, 'bin');
 
-        // Check if setup.mk exists and update it
         const setupMkPath = path.join(projectPath, 'setup.mk');
         await updatePathsInFile(setupMkPath);
         
-        // Update launch.json with correct paths and target
         await updateLaunchJson(projectPath);
         
-        // Create a terminal and run make
         const terminal = vscode.window.createTerminal('PS1 Build');
         terminal.show();
 
-        // Construct the PATH environment variable based on the platform
         let pathEnv;
         if (process.platform === 'win32') {
-            // Windows - PowerShell compatible command
             pathEnv = `$env:PATH = "${gccBinPath.replace(/\\/g, '\\')};${sdkBinPath.replace(/\\/g, '\\')};$env:PATH";`;
             terminal.sendText(`cd "${projectPath.replace(/\\/g, '\\')}"; ${pathEnv} make`);
         } else {
-            // Unix-like systems (Linux, macOS)
             pathEnv = `PATH="${gccBinPath}:${sdkBinPath}:$PATH"`;
             terminal.sendText(`cd "${projectPath}" && ${pathEnv} make`);
         }
@@ -338,43 +320,34 @@ async function buildProject() {
 // Function to run the emulator
 async function runEmulator() {
     try {
-        // Get the current workspace folder
         const workspaceFolder = vscode.workspace.workspaceFolders[0];
         if (!workspaceFolder) {
             throw new Error('No workspace folder open');
         }
-
+        
         const projectPath = workspaceFolder.uri.fsPath;
-
-        // Check if Makefile exists
+        
         const makefilePath = path.join(projectPath, 'Makefile');
         if (!fs.existsSync(makefilePath)) {
             throw new Error('Makefile not found in the project directory');
         }
-
-        // Get the paths to the tools
+        
         const gccBinPath = path.join(gccPath, 'bin');
         const sdkBinPath = path.join(ps1SdkPath, 'bin');
-
-        // Check if setup.mk exists and update it
+        
         const setupMkPath = path.join(projectPath, 'setup.mk');
         await updatePathsInFile(setupMkPath);
         
-        // Update launch.json with correct paths and target
         await updateLaunchJson(projectPath);
         
-        // Create a terminal and run make
-        const terminal = vscode.window.createTerminal('PS1 Emulator');
+        const terminal = vscode.window.createTerminal('PS1 Run');
         terminal.show();
-
-        // Construct the PATH environment variable based on the platform
+        
         let pathEnv;
         if (process.platform === 'win32') {
-            // Windows - PowerShell compatible command
             pathEnv = `$env:PATH = "${gccBinPath.replace(/\\/g, '\\')};${sdkBinPath.replace(/\\/g, '\\')};$env:PATH";`;
             terminal.sendText(`cd "${projectPath.replace(/\\/g, '\\')}"; ${pathEnv} make run`);
         } else {
-            // Unix-like systems (Linux, macOS)
             pathEnv = `PATH="${gccBinPath}:${sdkBinPath}:$PATH"`;
             terminal.sendText(`cd "${projectPath}" && ${pathEnv} make run`);
         }
@@ -386,43 +359,34 @@ async function runEmulator() {
 // Function to generate ISO
 async function generateISO() {
     try {
-        // Get the current workspace folder
         const workspaceFolder = vscode.workspace.workspaceFolders[0];
         if (!workspaceFolder) {
             throw new Error('No workspace folder open');
         }
-
+        
         const projectPath = workspaceFolder.uri.fsPath;
-
-        // Check if Makefile exists
+        
         const makefilePath = path.join(projectPath, 'Makefile');
         if (!fs.existsSync(makefilePath)) {
             throw new Error('Makefile not found in the project directory');
         }
-
-        // Get the paths to the tools
+        
         const gccBinPath = path.join(gccPath, 'bin');
         const sdkBinPath = path.join(ps1SdkPath, 'bin');
-
-        // Check if setup.mk exists and update it
+        
         const setupMkPath = path.join(projectPath, 'setup.mk');
         await updatePathsInFile(setupMkPath);
         
-        // Update launch.json with correct paths and target
         await updateLaunchJson(projectPath);
         
-        // Create a terminal and run make
-        const terminal = vscode.window.createTerminal('PS1 ISO Generation');
+        const terminal = vscode.window.createTerminal('PS1 ISO');
         terminal.show();
-
-        // Construct the PATH environment variable based on the platform
+        
         let pathEnv;
         if (process.platform === 'win32') {
-            // Windows - PowerShell compatible command
             pathEnv = `$env:PATH = "${gccBinPath.replace(/\\/g, '\\')};${sdkBinPath.replace(/\\/g, '\\')};$env:PATH";`;
             terminal.sendText(`cd "${projectPath.replace(/\\/g, '\\')}"; ${pathEnv} make iso`);
         } else {
-            // Unix-like systems (Linux, macOS)
             pathEnv = `PATH="${gccBinPath}:${sdkBinPath}:$PATH"`;
             terminal.sendText(`cd "${projectPath}" && ${pathEnv} make iso`);
         }
@@ -490,10 +454,8 @@ async function downloadAndExtractTool(toolName) {
     try {
         const toolsUrls = JSON.parse(fs.readFileSync(path.join(extensionPath, 'tools-urls.json'), 'utf8'));
         
-        // Get the current platform
         const platform = process.platform;
         
-        // Find the tool for the current platform
         let tool = null;
         for (const [key, value] of Object.entries(toolsUrls)) {
             if (key === toolName || key.startsWith(toolName + '_')) {
@@ -512,28 +474,21 @@ async function downloadAndExtractTool(toolName) {
         const extractPath = path.join(extensionPath, tool.extractPath);
         const checkFile = path.join(extractPath, tool.checkFile);
         
-        // Create the directory if it doesn't exist
         if (!fs.existsSync(extractPath)) {
             fs.mkdirSync(extractPath, { recursive: true });
         }
         
-        // Download the tool
         const response = await axios.get(url, { responseType: 'arraybuffer' });
         
-        // Extract the tool
-        // Check if the file is a DMG (macOS disk image)
         if (url.endsWith('.dmg')) {
-            // Save the DMG file
             const dmgPath = path.join(os.tmpdir(), `${toolName}.dmg`);
             fs.writeFileSync(dmgPath, Buffer.from(response.data));
             
-            // Mount the DMG
             const mountPoint = path.join(os.tmpdir(), `${toolName}_mount`);
             if (!fs.existsSync(mountPoint)) {
                 fs.mkdirSync(mountPoint, { recursive: true });
             }
             
-            // Use hdiutil to mount the DMG
             await new Promise((resolve, reject) => {
                 exec(`hdiutil attach "${dmgPath}" -mountpoint "${mountPoint}"`, (error) => {
                     if (error) {
@@ -544,7 +499,6 @@ async function downloadAndExtractTool(toolName) {
                 });
             });
             
-            // Copy the contents to the extract path
             await new Promise((resolve, reject) => {
                 exec(`cp -R "${mountPoint}/"* "${extractPath}/"`, (error) => {
                     if (error) {
@@ -555,7 +509,6 @@ async function downloadAndExtractTool(toolName) {
                 });
             });
             
-            // Unmount the DMG
             await new Promise((resolve, reject) => {
                 exec(`hdiutil detach "${mountPoint}"`, (error) => {
                     if (error) {
@@ -566,34 +519,27 @@ async function downloadAndExtractTool(toolName) {
                 });
             });
             
-            // Remove the DMG file
             fs.unlinkSync(dmgPath);
         } else {
-            // Special handling for PSN00B_SDK which contains a folder structure
             if (toolName.includes('psn00b_sdk')) {
-                // Create a temporary directory for extraction
                 const tempExtractPath = path.join(os.tmpdir(), `${toolName}_temp`);
                 if (fs.existsSync(tempExtractPath)) {
                     fse.removeSync(tempExtractPath);
                 }
                 fs.mkdirSync(tempExtractPath, { recursive: true });
                 
-                // Extract ZIP file to temp location
                 const zip = new AdmZip(Buffer.from(response.data));
                 zip.extractAllTo(tempExtractPath, true);
                 
-                // Clear the target directory
                 if (fs.existsSync(extractPath)) {
                     fse.emptyDirSync(extractPath);
                 } else {
                     fs.mkdirSync(extractPath, { recursive: true });
                 }
                 
-                // Find the SDK folder in the temp directory
                 const tempFiles = fs.readdirSync(tempExtractPath);
                 let sdkFolderName = null;
                 
-                // Look for the main SDK folder (usually named PSn00bSDK or similar)
                 for (const file of tempFiles) {
                     const filePath = path.join(tempExtractPath, file);
                     if (fs.statSync(filePath).isDirectory() && 
@@ -604,29 +550,23 @@ async function downloadAndExtractTool(toolName) {
                 }
                 
                 if (sdkFolderName) {
-                    // Move the SDK folder contents to the target location
                     const sdkFolderPath = path.join(tempExtractPath, sdkFolderName);
                     fse.copySync(sdkFolderPath, extractPath);
                 } else {
-                    // If no specific SDK folder found, copy everything
                     fse.copySync(tempExtractPath, extractPath);
                 }
                 
-                // Clean up temp directory
                 fse.removeSync(tempExtractPath);
             } else {
-                // Extract ZIP file directly for other tools
                 const zip = new AdmZip(Buffer.from(response.data));
                 zip.extractAllTo(extractPath, true);
             }
         }
         
-        // Check if the extraction was successful
         if (!fs.existsSync(checkFile)) {
             throw new Error(`Failed to extract ${toolName}. ${checkFile} not found.`);
         }
         
-        // Make the file executable
         if (platform !== 'win32') {
             await new Promise((resolve, reject) => {
                 exec(`chmod +x "${checkFile}"`, (error) => {
@@ -641,7 +581,6 @@ async function downloadAndExtractTool(toolName) {
         
         return true;
     } catch (error) {
-        console.error(error);
         return false;
     }
 }
