@@ -49,6 +49,22 @@
       {
         "command": "ps1-dev-extension.generateISO",
         "title": "PS1: Generate ISO"
+      },
+      {
+        "command": "ps1-dev-extension.installCompiler",
+        "title": "PS1: Install Compiler"
+      },
+      {
+        "command": "ps1-dev-extension.installSDK",
+        "title": "PS1: Install SDK"
+      },
+      {
+        "command": "ps1-dev-extension.installEmulator",
+        "title": "PS1: Install Emulator"
+      },
+      {
+        "command": "ps1-dev-extension.installDebugger",
+        "title": "PS1: Install Debugger"
       }
     ]
   },

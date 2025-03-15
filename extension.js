@@ -78,6 +78,39 @@ function activate(context) {
         }
     });
 
+    // Register individual component installation commands
+    let installCompilerDisposable = vscode.commands.registerCommand('ps1-dev-extension.installCompiler', async function () {
+        try {
+            await installComponent('gcc');
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to install compiler: ${error.message}`);
+        }
+    });
+    
+    let installSDKDisposable = vscode.commands.registerCommand('ps1-dev-extension.installSDK', async function () {
+        try {
+            await installComponent('psn00b_sdk');
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to install SDK: ${error.message}`);
+        }
+    });
+    
+    let installEmulatorDisposable = vscode.commands.registerCommand('ps1-dev-extension.installEmulator', async function () {
+        try {
+            await installComponent('emulator');
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to install emulator: ${error.message}`);
+        }
+    });
+    
+    let installDebuggerDisposable = vscode.commands.registerCommand('ps1-dev-extension.installDebugger', async function () {
+        try {
+            await installComponent('gdb_multiarch_win');
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to install debugger: ${error.message}`);
+        }
+    });
+
     // Fix permissions
     const fixPermissionsDisposable = vscode.commands.registerCommand('ps1-dev-extension.fixPermissions', async () => {
         await fixToolPermissions();
@@ -88,6 +121,10 @@ function activate(context) {
     context.subscriptions.push(buildProjectDisposable);
     context.subscriptions.push(runEmulatorDisposable);
     context.subscriptions.push(generateISODisposable);
+    context.subscriptions.push(installCompilerDisposable);
+    context.subscriptions.push(installSDKDisposable);
+    context.subscriptions.push(installEmulatorDisposable);
+    context.subscriptions.push(installDebuggerDisposable);
     context.subscriptions.push(fixPermissionsDisposable);
 }
 
@@ -231,6 +268,26 @@ async function setupEnvironment(isManualSetup = false) {
         vscode.window.showInformationMessage('PlayStation 1 development environment setup complete!');
     } else {
         vscode.window.showErrorMessage('Failed to set up PlayStation 1 development environment. Check the logs for details.');
+    }
+}
+
+// Function to install a component
+async function installComponent(componentName) {
+    const config = loadConfig();
+    const component = config.tools[componentName];
+    
+    if (component.installed) {
+        vscode.window.showInformationMessage(`${componentName} is already installed.`);
+        return;
+    }
+    
+    const success = await downloadAndExtractTool(componentName);
+    if (success) {
+        component.installed = true;
+        saveConfig(config);
+        vscode.window.showInformationMessage(`${componentName} installed successfully.`);
+    } else {
+        vscode.window.showErrorMessage(`Failed to install ${componentName}.`);
     }
 }
 
