@@ -2,7 +2,7 @@
 
 This extension provides tools for developing games and applications for PlayStation 1, including:
 
-- GCC, PlayStation 1 SDK, and emulator included
+- GCC, PSn00bSDK, and emulator included
 - Creation of Hello World projects
 - Compilation of projects for PlayStation 1
 - ISO generation for projects
@@ -22,6 +22,8 @@ This will:
 
 ## Manual Installation
 
+### Extension Installation
+
 If you prefer to install the extension manually:
 
 1. Download the latest release from [GitHub Releases](https://github.com/alextrevisan/psxdev-code-plugin/releases/latest/download/ps1-dev-extension.vsix)
@@ -30,6 +32,38 @@ If you prefer to install the extension manually:
    code --install-extension ps1-dev-extension.vsix
    ```
 3. Restart VS Code
+
+### Required Dependencies
+
+To manually install the required dependencies:
+
+1. **Install Chocolatey** (Windows package manager):
+   ```powershell
+   Set-ExecutionPolicy Bypass -Scope Process
+   Invoke-RestMethod "https://community.chocolatey.org/install.ps1" | Invoke-Expression
+   ```
+
+2. **Install MSYS2**:
+   ```powershell
+   choco install msys2 -y
+   ```
+
+3. **Update MSYS2 and install make**:
+   ```powershell
+   C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Syuu --noconfirm; pacman -S --noconfirm make"
+   ```
+
+4. **Add MSYS2 to system PATH**:
+   ```powershell
+   [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\tools\msys64\usr\bin", [System.EnvironmentVariableTarget]::Machine)
+   ```
+
+5. **Install Visual C++ Redistributable**:
+   ```powershell
+   $vcPath = "$env:TEMP\vc_redist.x64.exe"
+   Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile $vcPath
+   Start-Process -FilePath $vcPath -ArgumentList "/install /quiet /norestart" -Wait
+   ```
 
 ## Included Tools
 
@@ -51,7 +85,7 @@ This extension includes the following tools for PlayStation 1 development:
 ## Requirements
 
 - Visual Studio Code
-- Operating system: Windows, macOS, or Linux
+- Operating system: Windows, macOS (in progress)
 
 ## Installation
 
@@ -142,15 +176,3 @@ ps1-dev-extension/
 - If you encounter compilation issues, ensure that the GCC compiler and SDK are correctly installed in the `tools` directory.
 - To add an emulator, place the emulator executable in the `tools/emulator/` directory.
 
-## Release Notes
-
-### 0.2.0
-
-- Added support for automatic tool downloads
-- New Makefile format with support for ISO generation and multiple emulators
-- Added command to generate ISO
-- Updated the run command to use the 'make run' command
-
-### 0.1.0
-
-Initial release with basic functionality.
