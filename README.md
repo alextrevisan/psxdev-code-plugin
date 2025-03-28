@@ -6,7 +6,7 @@ This extension provides tools for developing games and applications for PlayStat
 - Creation of Hello World projects
 - Compilation of projects for PlayStation 1
 - ISO generation for projects
-- Running projects in the emulator
+- Running/Debuggin projects in the emulator
 
 ## Quick Setup (Windows)
 
