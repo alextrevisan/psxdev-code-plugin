@@ -42,7 +42,7 @@ else
         EMUBIN = $(EMULATOR_DIR)/PCSX-Redux.app/Contents/MacOS/pcsx-redux
     else
         # Linux configuration
-        EMUBIN = $(EMULATOR_DIR)/pcsx-redux
+        EMUBIN = $(EMULATOR_DIR)/PCSX-Redux-HEAD-x86_64.AppImage
     endif
 endif
 
