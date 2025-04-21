@@ -2,7 +2,7 @@
   "name": "ps1-dev-extension",
   "displayName": "PlayStation 1 Development",
   "description": "PlayStation 1 development environment for VSCode/Windsurf",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "PSDevTools",
   "repository": {
     "type": "git",
