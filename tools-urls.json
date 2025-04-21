@@ -11,6 +11,12 @@
     "checkFile": "bin/mipsel-none-elf-gcc.exe",
     "platform": "win32"
   },
+  "gcc_linux": {
+    "url": "https://github.com/Lameguy64/PSn00bSDK/releases/download/v0.24/gcc-mipsel-none-elf-12.3.0-linux.zip",
+    "extractPath": "tools/gcc",
+    "checkFile": "bin/mipsel-none-elf-gcc",
+    "platform": "linux"
+  },
   "psn00b_sdk": {
     "url": "https://github.com/alextrevisan/PSn00bSDK-MacOS/releases/download/28-02-25/psn00b-sdk-macos.zip",
     "extractPath": "tools/psn00b_sdk",
@@ -22,6 +28,12 @@
     "extractPath": "tools/psn00b_sdk",
     "checkFile": "bin/elf2x.exe",
     "platform": "win32"
+  },
+  "psn00b_sdk_linux": {
+    "url": "https://github.com/Lameguy64/PSn00bSDK/releases/download/v0.24/PSn00bSDK-0.24-Linux.zip",
+    "extractPath": "tools/psn00b_sdk",
+    "checkFile": "bin/elf2x",
+    "platform": "linux"
   },
   "emulator_mac": {
     "url": "https://distrib.app/storage/assets/7db/12f/0f7/7ad7a85595c95d0e3d175520473f0529f801effbf1283cc106cffed/PCSX-Redux-c7d263b8-Arm.dmg",
@@ -36,6 +48,13 @@
     "checkFile": "pcsx-redux.exe",
     "optional": true,
     "platform": "win32"
+  },
+  "emulator_linux": {
+    "url": "https://distrib.app/storage/assets/c46/aff/5dd/d0ee5cfae10f52bc3bb1bc636c390a4df98df026d378c07c350b15e/PCSX-Redux-dec9cd9e-linux-x86_64.zip",
+    "extractPath": "tools/emulator",
+    "checkFile": "PCSX-Redux-HEAD-x86_64.AppImage",
+    "optional": true,
+    "platform": "linux"
   },
   "gdb_multiarch_win": {
     "url": "https://github.com/adamrehn/gdb-multiarch-windows/releases/download/gdb-11.2/gdb-11.2.zip",
